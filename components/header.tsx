@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,25 +11,67 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Stethoscope, Brain, Sparkles, Heart, MapPin, DollarSign, FileText, ChevronRight } from "lucide-react"
+} from "@/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Menu,
+  Stethoscope,
+  Brain,
+  Sparkles,
+  Heart,
+  DollarSign,
+  FileText,
+  ChevronRight,
+  LayoutGrid,
+  Home,
+  CreditCard,
+} from "lucide-react";
 
 const specialties = [
-  { title: "Odontologia", description: "Consultórios equipados com cadeira e instrumentos", href: "/specialties/odontologia", icon: Stethoscope },
-  { title: "Psicologia", description: "Salas com isolamento acústico e ambiente acolhedor", href: "/specialties/psicologia", icon: Brain },
-  { title: "Estética", description: "Espaços para procedimentos estéticos e dermatológicos", href: "/specialties/estetica", icon: Sparkles },
-  { title: "Médicos", description: "Consultórios completos para consultas gerais", href: "/specialties/medicos", icon: Heart },
-]
+  {
+    title: "Odontologia",
+    description: "Consultórios equipados com cadeira e instrumentos",
+    href: "/espacos?specialty=odontologia",
+    icon: Stethoscope,
+  },
+  {
+    title: "Psicologia",
+    description: "Salas com isolamento acústico e ambiente acolhedor",
+    href: "/espacos?specialty=psicologia",
+    icon: Brain,
+  },
+  {
+    title: "Estética",
+    description: "Espaços para procedimentos estéticos e dermatológicos",
+    href: "/espacos?specialty=estetica",
+    icon: Sparkles,
+  },
+  {
+    title: "Médicos",
+    description: "Consultórios completos para consultas gerais",
+    href: "/espacos?specialty=medicina",
+    icon: Heart,
+  },
+];
 
 const navItems = [
+  // ADICIONADO: Link explícito para Início
+  { label: "Início", href: "/", icon: Home },
+  { label: "Espaços", href: "/espacos", icon: LayoutGrid },
+  // ADICIONADO: Página dedicada de Planos
+  { label: "Planos e Preços", href: "/planos", icon: CreditCard },
   { label: "Seja Anfitrião", href: "/seja-anfitriao", icon: DollarSign },
-  { label: "Sobre", href: "/sobre", icon: FileText },
-  { label: "Blog", href: "#blog", icon: FileText },
-]
+  { label: "Blog", href: "/blog", icon: FileText },
+];
 
 export function Header() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <motion.header
@@ -48,14 +90,15 @@ export function Header() {
           >
             <span className="text-lg font-bold text-primary-foreground">F</span>
           </motion.div>
-          <span className="text-xl font-bold text-foreground">Fusion Clinic</span>
+          <span className="text-xl font-bold text-foreground">
+            Fusion Clinic
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex lg:items-center lg:gap-1">
           <NavigationMenu>
             <NavigationMenuList>
-              {/* Especialidades Mega Menu */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 data-[state=open]:bg-accent/50">
                   Especialidades
@@ -72,8 +115,12 @@ export function Header() {
                             <specialty.icon className="h-5 w-5" />
                           </div>
                           <div className="space-y-1">
-                            <p className="text-sm font-medium text-foreground">{specialty.title}</p>
-                            <p className="text-xs text-muted-foreground leading-relaxed">{specialty.description}</p>
+                            <p className="text-sm font-medium text-foreground">
+                              {specialty.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {specialty.description}
+                            </p>
                           </div>
                         </Link>
                       </NavigationMenuLink>
@@ -82,14 +129,16 @@ export function Header() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* Other Nav Items */}
               {navItems.map((item) => (
                 <NavigationMenuItem key={item.label}>
-                  <Link href={item.href} legacyBehavior passHref>
-                    <NavigationMenuLink className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none">
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={item.href}
+                      className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                    >
                       {item.label}
-                    </NavigationMenuLink>
-                  </Link>
+                    </Link>
+                  </NavigationMenuLink>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
@@ -122,12 +171,17 @@ export function Header() {
               <span className="sr-only">Abrir menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-full max-w-sm bg-background/95 backdrop-blur-xl">
+          <SheetContent
+            side="right"
+            className="w-full max-w-sm bg-background/95 backdrop-blur-xl"
+          >
             <SheetHeader>
               <SheetTitle className="text-left">Menu</SheetTitle>
             </SheetHeader>
             <div className="mt-6 flex flex-col gap-2">
-              <p className="px-2 text-xs font-medium uppercase text-muted-foreground">Especialidades</p>
+              <p className="px-2 text-xs font-medium uppercase text-muted-foreground">
+                Especialidades
+              </p>
               {specialties.map((specialty) => (
                 <Link
                   key={specialty.title}
@@ -142,9 +196,9 @@ export function Header() {
                   <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
                 </Link>
               ))}
-              
+
               <div className="my-4 h-px bg-border" />
-              
+
               {navItems.map((item) => (
                 <Link
                   key={item.label}
@@ -160,7 +214,10 @@ export function Header() {
               ))}
 
               <div className="mt-6 flex flex-col gap-3">
-                <Button variant="outline" className="w-full rounded-xl bg-transparent">
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl bg-transparent"
+                >
                   Fazer Login
                 </Button>
                 <Button className="w-full rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
@@ -172,5 +229,5 @@ export function Header() {
         </Sheet>
       </nav>
     </motion.header>
-  )
+  );
 }
