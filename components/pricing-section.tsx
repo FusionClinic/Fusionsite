@@ -1,7 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Zap, Star, Crown, ArrowRight, TrendingUp } from "lucide-react";
+import {
+  Check,
+  Zap,
+  Star,
+  Crown,
+  ArrowRight,
+  TrendingUp,
+  CalendarClock,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,26 +43,47 @@ const pricingPlans = [
   },
   {
     id: "plano10",
-    name: "Plano 10h",
-    tag: "Campeão de Vendas",
+    name: "Pacote 10h",
+    tag: "Mais Vendido",
     tagIcon: Star,
-    description: "Atende toda semana? Garanta o melhor preço do mercado.",
+    description: "Para quem está começando a ter volume de pacientes.",
     price: "R$ 320",
     period: "/mês",
     popular: true,
-    // GATILHO: Ancoragem de preço para mostrar valor
-    highlightText: "Economize R$ 130/mês",
+    highlightText: "Sai a R$ 32/hora",
     features: [
-      "Sai a R$ 32,00/hora",
+      "Validade de 30 dias",
+      "Use em qualquer horário",
+      "Desconto de 30% vs Avulso",
       "Prioridade na agenda",
-      "Perfil em destaque no site",
-      "Créditos válidos por 30 dias",
       "Pagamento mensal simplificado",
-      "Sem fidelidade (cancele quando quiser)",
+      "Sem fidelidade",
     ],
-    cta: "Quero Economizar",
+    cta: "Comprar Pacote",
     ctaLink:
-      "https://wa.me/5584999999999?text=Olá! Quero saber mais sobre o Plano de 10h da Fusion.",
+      "https://wa.me/5511919119054?text=Olá! Quero saber mais sobre o Plano de 10h da Fusion.",
+  },
+  {
+    id: "turno",
+    name: "Turno Fixo",
+    tag: "Melhor Custo",
+    tagIcon: CalendarClock,
+    description: "4 horas semanais em dia fixo. Total de 16h no mês.",
+    price: "R$ 400",
+    period: "/mês",
+    popular: false,
+    highlightText: "Sai a R$ 25/hora",
+    features: [
+      "Seu horário garantido sempre",
+      "4h por semana (ex: toda Terça à tarde)",
+      "Total de 16 horas mensais",
+      "O menor valor por hora",
+      "Nome na porta (opcional)",
+      "Previsibilidade total",
+    ],
+    cta: "Garantir Meu Turno",
+    ctaLink:
+      "https://wa.me/5511919119054?text=Olá! Tenho interesse em fixar um Turno semanal.",
   },
   {
     id: "exclusiva",
@@ -66,7 +95,7 @@ const pricingPlans = [
     price: "Sob Consulta",
     period: "",
     popular: false,
-    highlightText: "Últimas unidades no Tirol",
+    highlightText: "Últimas unidades",
     features: [
       "Uso exclusivo (chave na mão)",
       "Sua logo na porta",
@@ -77,7 +106,7 @@ const pricingPlans = [
     ],
     cta: "Falar com Consultor",
     ctaLink:
-      "https://wa.me/5584999999999?text=Tenho interesse em uma Sala Exclusiva mensal.",
+      "https://wa.me/5511919119054?text=Tenho interesse em uma Sala Exclusiva mensal.",
   },
 ];
 
@@ -118,7 +147,8 @@ export function PricingSection() {
           </div>
         </FadeInUp>
 
-        <StaggerContainer className="grid gap-8 lg:grid-cols-3 items-start">
+        {/* Ajuste no grid para comportar 4 colunas em telas grandes */}
+        <StaggerContainer className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 items-start">
           {pricingPlans.map((plan) => (
             <StaggerItem key={plan.id}>
               <motion.div
@@ -142,7 +172,7 @@ export function PricingSection() {
                     </div>
                   )}
 
-                  <CardHeader className="pb-4 pt-8 px-6">
+                  <CardHeader className="pb-4 pt-8 px-5">
                     <div className="flex items-center gap-2 mb-4">
                       <div
                         className={`flex h-10 w-10 items-center justify-center rounded-xl ${
@@ -154,20 +184,20 @@ export function PricingSection() {
                         <plan.tagIcon className="h-5 w-5" />
                       </div>
                       <span
-                        className={`text-sm font-bold tracking-wide uppercase ${plan.popular ? "text-primary" : "text-muted-foreground"}`}
+                        className={`text-xs font-bold tracking-wide uppercase ${plan.popular ? "text-primary" : "text-muted-foreground"}`}
                       >
                         {plan.tag}
                       </span>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-foreground">
+                    <h3 className="text-xl font-bold text-foreground">
                       {plan.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed min-h-[40px]">
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed min-h-[40px]">
                       {plan.description}
                     </p>
 
-                    <div className="mt-6 p-4 rounded-2xl bg-muted/50 border border-border/50">
+                    <div className="mt-6 p-3 rounded-2xl bg-muted/50 border border-border/50">
                       {plan.highlightText && (
                         <div className="mb-1">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-sm">
@@ -176,30 +206,30 @@ export function PricingSection() {
                         </div>
                       )}
                       <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-extrabold text-foreground">
+                        <span className="text-2xl font-extrabold text-foreground">
                           {plan.price}
                         </span>
-                        <span className="text-sm font-medium text-muted-foreground">
+                        <span className="text-xs font-medium text-muted-foreground">
                           {plan.period}
                         </span>
                       </div>
                     </div>
                   </CardHeader>
 
-                  <CardContent className="flex-1 flex flex-col px-6 pb-8">
-                    <ul className="space-y-4 mb-8 flex-1">
+                  <CardContent className="flex-1 flex flex-col px-5 pb-8">
+                    <ul className="space-y-3 mb-8 flex-1">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-3">
+                        <li key={feature} className="flex items-start gap-2">
                           <div
-                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full mt-0.5 ${
+                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full mt-0.5 ${
                               plan.popular
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-primary/20 text-primary"
                             }`}
                           >
-                            <Check className="h-3 w-3" />
+                            <Check className="h-2.5 w-2.5" />
                           </div>
-                          <span className="text-sm text-foreground/80 font-medium">
+                          <span className="text-xs text-foreground/80 font-medium leading-tight">
                             {feature}
                           </span>
                         </li>
@@ -212,7 +242,7 @@ export function PricingSection() {
                     >
                       <Button
                         asChild
-                        className={`w-full h-12 rounded-xl font-bold text-base shadow-lg ${
+                        className={`w-full h-10 rounded-xl font-bold text-sm shadow-lg ${
                           plan.popular
                             ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-primary/25"
                             : "bg-white dark:bg-zinc-800 text-foreground border-2 border-muted hover:border-primary/50"
@@ -225,7 +255,7 @@ export function PricingSection() {
                           }
                         >
                           {plan.cta}
-                          <ArrowRight className="ml-2 w-4 h-4" />
+                          <ArrowRight className="ml-2 w-3 h-3" />
                         </a>
                       </Button>
                     </motion.div>
@@ -242,7 +272,7 @@ export function PricingSection() {
             href="/planos"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
           >
-            Ver comparativo completo e calculadora de economia
+            Ver comparativo detalhado
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

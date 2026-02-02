@@ -22,7 +22,7 @@ import {
   ArrowRight,
   TrendingUp,
   AlertCircle,
-  ShieldCheck,
+  CalendarClock, // NOVO ÍCONE
 } from "lucide-react";
 import {
   Accordion,
@@ -31,7 +31,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-// DADOS OTIMIZADOS PARA VENDAS (Baseado em R$ 45/h)
+// DADOS OTIMIZADOS PARA VENDAS (Tabela 2026)
 const plans = [
   {
     name: "Hora Avulsa",
@@ -52,7 +52,7 @@ const plans = [
     badge: null,
   },
   {
-    name: "Plano 10h",
+    name: "Pacote 10h",
     description: "Atende semanalmente? Pare de perder dinheiro no avulso.",
     price: "R$ 320",
     period: "/mês",
@@ -70,27 +70,48 @@ const plans = [
     ],
     cta: "Quero Economizar",
     color: "bg-primary",
-    badge: "Melhor Custo-Benefício",
+    badge: "Mais Vendido",
   },
   {
-    name: "Turnos / Diárias",
+    // NOVO PLANO TURNO FIXO
+    name: "Turno Fixo",
     description:
-      "Concentra pacientes em um dia só? Garanta sua sala fixa naquele dia.",
+      "4h por semana em dia e horário fixo (ex: Toda Terça à tarde).",
+    price: "R$ 400",
+    period: "/mês",
+    oldPrice: null, // Sem "De R$" pois é um produto novo
+    savings: "Menor valor por hora",
+    priceDetail: "Apenas R$ 25/hora",
+    icon: CalendarClock,
+    popular: false, // Deixamos o destaque visual, mas sem a tag "Mais Vendido" para não poluir
+    features: [
+      "Total de 16 horas mensais",
+      "Sua sala garantida sempre",
+      "Previsibilidade total",
+      "Nome na porta (opcional)",
+    ],
+    cta: "Garantir Turno",
+    color: "bg-purple-500",
+    badge: "Melhor Custo", // Badge exclusiva
+  },
+  {
+    name: "Diária (10h)", // RENOMEADO para clareza
+    description:
+      "Concentra todos os pacientes em um dia só? A sala é sua o dia todo.",
     price: "R$ 300",
-    period: "/diária (10h)",
-    // ANCORAGEM: 10h x R$45 = R$450
+    period: "/dia (08h às 18h)",
     oldPrice: "R$ 450",
     savings: "Economia de R$ 150/dia",
-    priceDetail: "Apenas R$ 30/hora",
+    priceDetail: "Sai a R$ 30/hora",
     icon: Calendar,
     popular: false,
     features: [
-      "Garantia da MESMA sala sempre",
-      "Sua rotina organizada",
+      "Uso exclusivo no dia",
+      "Chave na mão das 08h às 18h",
       "Recepcionista dedicada",
-      "Desconto em turnos fixos",
+      "Ideal para quem vem do interior",
     ],
-    cta: "Cotar Disponibilidade",
+    cta: "Cotar Data",
     color: "bg-orange-500",
     badge: null,
   },
@@ -103,7 +124,7 @@ const plans = [
     icon: Crown,
     popular: false,
     features: [
-      "Uso exclusivo do espaço",
+      "Uso exclusivo 24h/7 dias",
       "Sua logo na porta",
       "Endereço Fiscal e Comercial",
       "Móveis e Decor inclusos",
@@ -118,19 +139,19 @@ const plans = [
 
 const faqs = [
   {
-    question: "Como funciona o pacote de 10h?",
+    question: "Qual a diferença entre Turno Fixo e Pacote de 10h?",
     answer:
-      "Você contrata um crédito de 10 horas para usar durante o mês. É como um plano de celular: você tem a liberdade de agendar essas horas quando quiser, garantindo um valor por hora muito mais baixo (R$ 32/h) do que o avulso (R$ 45/h).",
+      "No Turno Fixo, você tem um compromisso semanal (ex: toda quarta das 14h às 18h). A sala é sua naquele horário, ninguém mais usa. Já no Pacote de 10h, você tem um saldo de horas para agendar livremente conforme a demanda dos pacientes, em dias e horários variados.",
   },
   {
-    question: "As horas acumulam para o próximo mês?",
+    question: "O Turno Fixo garante a mesma sala?",
     answer:
-      "Os pacotes são mensais para garantir a disponibilidade da agenda para todos os profissionais. As horas devem ser utilizadas dentro do mês vigente.",
+      "Sim! Ao contratar um Turno Fixo, você escolhe sua sala preferida e ela fica bloqueada para você naquele horário específico todas as semanas.",
   },
   {
-    question: "O que está incluso na Diária?",
+    question: "Como funciona a Diária de 10h?",
     answer:
-      "A Diária contempla o uso da sala durante todo o horário comercial (ex: 08h às 18h) por um valor fixo de R$ 300. Ideal para quem concentra todos os atendimentos em um único dia da semana.",
+      "A Diária é perfeita para quem mora fora ou concentra agenda. Você paga um valor único (R$ 300) e pode usar a sala das 08:00 às 18:00. Se você atendesse as mesmas 10 horas no avulso, pagaria R$ 450.",
   },
   {
     question: "Preciso de fiador para a Sala Exclusiva?",
@@ -143,38 +164,44 @@ const faqs = [
 function SavingsSimulator() {
   const [hoursPerWeek, setHoursPerWeek] = useState(5);
 
-  // Cálculos Baseados na nova hora avulsa de R$ 45
   const hoursPerMonth = hoursPerWeek * 4;
   const costAvulso = hoursPerMonth * 45;
-
-  // Lógica Simplificada: Sempre compara com o Plano 10h ou Múltiplos dele
-  // Se atender mais de 10h, sugerimos múltiplos pacotes ou Turnos, mas para simplificar o calculo visual:
-  // Vamos assumir que a pessoa compraria Pacotes de 10h (R$ 320) + Horas Avulsas (R$ 45) para o excedente
 
   const packsNeeded = Math.floor(hoursPerMonth / 10);
   const remainingHours = hoursPerMonth % 10;
 
-  // Custo Otimizado: (Qtde Pacotes * 320) + (Horas Restantes * 45)
-  // Se a pessoa atende menos de 10h no mês, o comparativo é direto com o pacote mínimo para mostrar quanto ela perderia não assinando, ou se vale a pena avulso.
-
   let recommendedPlan = "Plano 10h";
   let totalPlanCost = 0;
 
-  if (hoursPerMonth <= 10) {
-    // Se atende pouco, compara o custo avulso com o custo do plano fixo (R$ 320)
-    // Às vezes o plano sai mais barato que o avulso se for > 7 horas (7 * 45 = 315)
-    totalPlanCost = 320;
+  // Lógica de recomendação atualizada
+  if (hoursPerMonth <= 8) {
+    // Até 8h/mês, avulso ou pacote pequeno
+    if (hoursPerMonth < 8) {
+      totalPlanCost = hoursPerMonth * 45; // Avulso compensa
+      recommendedPlan = "Hora Avulsa";
+    } else {
+      totalPlanCost = 320; // 8h avulso (360) > Plano 10h (320)
+    }
+  } else if (hoursPerMonth >= 16 && hoursPerMonth <= 20) {
+    // Faixa ideal do Turno Fixo (16h)
+    // Se a pessoa atende 4h/semana = 16h/mês
+    // Custo avulso: 720 | Custo Turno: 400
+    totalPlanCost = 400;
+    recommendedPlan = "Turno Fixo (16h)";
   } else {
+    // Regra geral dos pacotes
     totalPlanCost = packsNeeded * 320 + remainingHours * 45;
-    if (packsNeeded > 1) recommendedPlan = `${packsNeeded}x Planos 10h`;
+    if (packsNeeded >= 1)
+      recommendedPlan = `${packsNeeded}x Planos 10h + Avulso`;
   }
 
-  // Se o custo do plano for maior que o avulso (ex: 2h por semana = 8h mês = R$ 360 avulso vs R$ 320 plano), o plano compensa.
-  // Se for 1h por semana = 4h mês = R$ 180 avulso. Plano não compensa.
-  // Ajuste visual para não mostrar "Economia Negativa"
+  // Ajuste para não bugar o visual se o recomendado for o próprio avulso
+  if (recommendedPlan === "Hora Avulsa") {
+    totalPlanCost = costAvulso;
+  }
 
   let monthlySavings = costAvulso - totalPlanCost;
-  if (monthlySavings < 0) monthlySavings = 0; // Não mostra negativo
+  if (monthlySavings < 0) monthlySavings = 0;
 
   const yearlySavings = monthlySavings * 12;
 
@@ -191,8 +218,7 @@ function SavingsSimulator() {
             Pare de deixar dinheiro na mesa
           </h3>
           <p className="text-muted-foreground mb-8">
-            Arraste para ver quanto você economiza migrando do avulso para
-            nossos planos.
+            Simule quantas horas você atende por semana e veja a economia real.
           </p>
 
           <div className="space-y-6">
@@ -205,7 +231,7 @@ function SavingsSimulator() {
             <Slider
               defaultValue={[5]}
               max={40}
-              min={2} // Começa em 2h para fazer sentido o calculo
+              min={2}
               step={1}
               onValueChange={(val) => setHoursPerWeek(val[0])}
               className="py-4"
@@ -225,7 +251,7 @@ function SavingsSimulator() {
               </span>
             </div>
             <div className="flex justify-between items-center font-bold text-lg">
-              <span>Com {recommendedPlan}:</span>
+              <span>Melhor opção: {recommendedPlan}</span>
               <span className="text-primary">R$ {totalPlanCost}</span>
             </div>
 
@@ -238,7 +264,7 @@ function SavingsSimulator() {
                   R$ {yearlySavings.toLocaleString("pt-BR")}
                 </p>
                 <p className="text-xs text-green-700 dark:text-green-500">
-                  Dinheiro que sobra no seu bolso.
+                  Investimento que vira lucro.
                 </p>
               </div>
             </div>
@@ -288,10 +314,10 @@ export default function PricingPage() {
         <SavingsSimulator />
       </section>
 
-      {/* Cards de Preço */}
+      {/* Cards de Preço - LAYOUT ATUALIZADO PARA 5 COLUNAS EM TELA GRANDE */}
       <section className="py-16 relative z-10">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+        <div className="mx-auto max-w-[1400px] px-4 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-start">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
@@ -357,7 +383,7 @@ export default function PricingPage() {
                       )}
 
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold text-foreground">
+                        <span className="text-2xl font-bold text-foreground">
                           {plan.price}
                         </span>
                         <span className="text-xs text-muted-foreground font-medium">
@@ -467,7 +493,7 @@ export default function PricingPage() {
               className="rounded-xl px-8 shadow-xl shadow-primary/20 h-12 text-base"
               asChild
             >
-              <a href="https://wa.me/5584999999999" target="_blank">
+              <a href="https://wa.me/5511919119054" target="_blank">
                 Falar com Consultor no WhatsApp
               </a>
             </Button>

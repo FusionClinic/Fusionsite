@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Sheet,
   SheetContent,
@@ -21,12 +19,13 @@ import {
 } from "@/components/ui/sheet";
 import {
   Menu,
-  Stethoscope,
+  Apple,
   Brain,
   Sparkles,
   Heart,
   DollarSign,
   FileText,
+  ChevronDown,
   ChevronRight,
   LayoutGrid,
   Home,
@@ -35,10 +34,10 @@ import {
 
 const specialties = [
   {
-    title: "Odontologia",
-    description: "Consultórios equipados com cadeira e instrumentos",
-    href: "/espacos?specialty=odontologia",
-    icon: Stethoscope,
+    title: "Nutrição",
+    description: "Espaços ideais para atendimento nutricional e dietético",
+    href: "/espacos?specialty=nutricao",
+    icon: Apple,
   },
   {
     title: "Psicologia",
@@ -61,10 +60,8 @@ const specialties = [
 ];
 
 const navItems = [
-  // ADICIONADO: Link explícito para Início
   { label: "Início", href: "/", icon: Home },
   { label: "Espaços", href: "/espacos", icon: LayoutGrid },
-  // ADICIONADO: Página dedicada de Planos
   { label: "Planos e Preços", href: "/planos", icon: CreditCard },
   { label: "Seja Anfitrião", href: "/seja-anfitriao", icon: DollarSign },
   { label: "Blog", href: "/blog", icon: FileText },
@@ -72,95 +69,111 @@ const navItems = [
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60"
-    >
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 animate-in fade-in slide-in-from-top-2 duration-500">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <motion.div
-            whileHover={{ scale: 1.05, rotate: 3 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25"
-          >
-            <span className="text-lg font-bold text-primary-foreground">F</span>
-          </motion.div>
-          <span className="text-xl font-bold text-foreground">
-            Fusion Clinic
-          </span>
+        {/* ÁREA DA LOGO */}
+        <Link href="/" className="relative flex items-center">
+          <div className="relative h-10 w-40 md:h-12 md:w-48">
+            <Image
+              src="/logo.png"
+              alt="Fusion Clinic Logo"
+              fill
+              className="object-contain object-left"
+              priority
+            />
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex lg:items-center lg:gap-1">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50 data-[state=open]:bg-accent/50">
-                  Especialidades
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid w-[500px] gap-2 p-4 lg:grid-cols-2">
-                    {specialties.map((specialty) => (
-                      <NavigationMenuLink key={specialty.title} asChild>
-                        <Link
-                          href={specialty.href}
-                          className="group flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-accent"
-                        >
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                            <specialty.icon className="h-5 w-5" />
-                          </div>
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium text-foreground">
-                              {specialty.title}
-                            </p>
-                            <p className="text-xs text-muted-foreground leading-relaxed">
-                              {specialty.description}
-                            </p>
-                          </div>
-                        </Link>
-                      </NavigationMenuLink>
-                    ))}
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+        <div className="hidden lg:flex lg:items-center lg:gap-6">
+          {/* Menu Dropdown com POPOVER */}
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+              <button className="group flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors outline-none data-[state=open]:text-foreground">
+                Especialidades
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${popoverOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-[600px] p-4"
+              align="start"
+              sideOffset={8}
+            >
+              <div className="grid grid-cols-2 gap-4">
+                {specialties.map((specialty) => (
+                  <Link
+                    key={specialty.title}
+                    href={specialty.href}
+                    onClick={() => setPopoverOpen(false)}
+                    className="group flex items-start gap-4 rounded-xl p-3 transition-colors hover:bg-muted"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                      <specialty.icon className="h-5 w-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium leading-none text-foreground group-hover:text-primary transition-colors">
+                        {specialty.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {specialty.description}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-4 border-t pt-4">
+                <Link
+                  href="/espacos"
+                  onClick={() => setPopoverOpen(false)}
+                  className="flex items-center justify-center gap-2 text-sm font-medium text-primary hover:underline"
+                >
+                  Ver todas as opções <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </PopoverContent>
+          </Popover>
 
-              {navItems.map((item) => (
-                <NavigationMenuItem key={item.label}>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href={item.href}
-                      className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
-                    >
-                      {item.label}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
+          {/* Links Simples */}
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`text-sm font-medium transition-colors hover:text-foreground ${
+                  isActive
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Desktop CTAs */}
+        {/* Desktop CTAs (BOTÃO PADRÃO FUSION) */}
         <div className="hidden lg:flex lg:items-center lg:gap-3">
-          <Button variant="ghost" className="rounded-xl">
-            Fazer Login
-          </Button>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            <Button className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25 transition-shadow hover:shadow-xl hover:shadow-primary/30">
-              <span className="relative z-10">Cadastre-se</span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "100%" }}
-                transition={{ duration: 0.5 }}
-              />
+          <div className="hover:scale-105 active:scale-95 transition-transform">
+            <Button
+              asChild
+              className="rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30"
+            >
+              <a
+                href="https://wa.me/5584999999999?text=Olá! Quero saber como ser Fusion."
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Quero ser Fusion
+              </a>
             </Button>
-          </motion.div>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -179,25 +192,30 @@ export function Header() {
               <SheetTitle className="text-left">Menu</SheetTitle>
             </SheetHeader>
             <div className="mt-6 flex flex-col gap-2">
-              <p className="px-2 text-xs font-medium uppercase text-muted-foreground">
-                Especialidades
-              </p>
-              {specialties.map((specialty) => (
-                <Link
-                  key={specialty.title}
-                  href={specialty.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-accent"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <specialty.icon className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm font-medium">{specialty.title}</span>
-                  <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
-                </Link>
-              ))}
+              <div className="px-2 pb-2">
+                <p className="text-xs font-medium uppercase text-muted-foreground mb-4">
+                  Especialidades
+                </p>
+                <div className="grid gap-2">
+                  {specialties.map((specialty) => (
+                    <Link
+                      key={specialty.title}
+                      href={specialty.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-accent"
+                    >
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <specialty.icon className="h-4 w-4" />
+                      </div>
+                      <span className="text-sm font-medium">
+                        {specialty.title}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
 
-              <div className="my-4 h-px bg-border" />
+              <div className="my-2 h-px bg-border" />
 
               {navItems.map((item) => (
                 <Link
@@ -215,19 +233,22 @@ export function Header() {
 
               <div className="mt-6 flex flex-col gap-3">
                 <Button
-                  variant="outline"
-                  className="w-full rounded-xl bg-transparent"
+                  asChild
+                  className="w-full rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-bold h-12 shadow-lg shadow-primary/25"
                 >
-                  Fazer Login
-                </Button>
-                <Button className="w-full rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
-                  Cadastre-se
+                  <a
+                    href="https://wa.me/5511919119054?text=Olá! Quero saber como ser Fusion."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Quero ser Fusion
+                  </a>
                 </Button>
               </div>
             </div>
           </SheetContent>
         </Sheet>
       </nav>
-    </motion.header>
+    </header>
   );
 }
