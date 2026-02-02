@@ -11,42 +11,43 @@ import { Footer } from "@/components/footer";
 import { StickyMobileCTA } from "@/components/sticky-mobile-cta";
 
 export default function HomePage() {
-  // SEO Local: Isso ajuda a aparecer no Google Maps e Box de Empresas
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "HealthAndBeautyBusiness",
     name: "Fusion Clinic",
-    image: "https://fusionclinic.com.br/icon-light-32x32.png", // Substitua pela logo real
-    "@id": "https://fusionclinic.com.br",
-    url: "https://fusionclinic.com.br",
+    description:
+      "Aluguel de consultórios mobiliados em Natal para profissionais de saúde.",
+    image: "https://www.fusionclinic.com.br/og-image.jpg",
+    "@id": "https://www.fusionclinic.com.br",
+    url: "https://www.fusionclinic.com.br",
     telephone: "+5584999999999",
-    priceRange: "$$",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Av. Afonso Pena, 1234", // Endereço Fictício - AJUSTE
+      streetAddress: "Rua Exemplo, 123",
       addressLocality: "Natal",
       addressRegion: "RN",
-      postalCode: "59000-000", // AJUSTE
+      postalCode: "59000-000",
       addressCountry: "BR",
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: -5.79448, // Coordenadas aproximadas de Natal
+      latitude: -5.79448,
       longitude: -35.211,
     },
-    openingHoursSpecification: {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ],
-      opens: "08:00",
-      closes: "18:00",
-    },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        opens: "08:00",
+        closes: "20:00",
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: "Saturday",
+        opens: "08:00",
+        closes: "12:00",
+      },
+    ],
   };
 
   return (
