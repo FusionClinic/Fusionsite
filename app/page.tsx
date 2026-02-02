@@ -20,19 +20,19 @@ export default function HomePage() {
     image: "https://www.fusionclinic.com.br/og-image.jpg",
     "@id": "https://www.fusionclinic.com.br",
     url: "https://www.fusionclinic.com.br",
-    telephone: "+5584999999999",
+    telephone: "+5511919119054",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Rua Exemplo, 123",
-      addressLocality: "Natal",
+      streetAddress: "R. da Saudade, 762",
+      addressLocality: "Lagoa Nova, Natal",
       addressRegion: "RN",
-      postalCode: "59000-000",
+      postalCode: "59056-125",
       addressCountry: "BR",
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: -5.79448,
-      longitude: -35.211,
+      latitude: -5.8117973, // Coordenadas aproximadas para R. da Saudade, 762
+      longitude: -35.2131972,
     },
     openingHoursSpecification: [
       {

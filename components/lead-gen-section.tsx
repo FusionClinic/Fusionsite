@@ -1,29 +1,28 @@
-"use client"
+"use client";
 
-import React from "react"
-
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { MessageCircle, Sparkles, CheckCircle2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { MessageCircle, Sparkles, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { FadeInUp } from "@/components/motion-wrapper"
+} from "@/components/ui/select";
+import { FadeInUp } from "@/components/motion-wrapper";
+import { trackEvent } from "@/lib/tracking"; // Importando o rastreador sênior
 
 const benefits = [
   "Análise gratuita do seu perfil profissional",
-  "Recomendação personalizada de plano",
-  "Tour virtual pelos consultórios",
+  "Recomendação personalizada de plano (Hora ou Turno)",
+  "Tour virtual pelos consultórios em Lagoa Nova",
   "Desconto exclusivo na primeira reserva",
-]
+];
 
 const specialties = [
   "Odontologia",
@@ -35,200 +34,195 @@ const specialties = [
   "Fisioterapia",
   "Fonoaudiologia",
   "Outro",
-]
+];
 
 export function LeadGenSection() {
   const [formData, setFormData] = useState({
     name: "",
     whatsapp: "",
     specialty: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const formatWhatsApp = (value: string) => {
-    const numbers = value.replace(/\D/g, "")
-    if (numbers.length <= 2) return numbers
-    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`
-  }
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 7)
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
 
   const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatWhatsApp(e.target.value)
-    setFormData({ ...formData, whatsapp: formatted })
-  }
+    const formatted = formatWhatsApp(e.target.value);
+    setFormData({ ...formData, whatsapp: formatted });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSubmitting(false)
-    // Reset form or show success message
-  }
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // 1. Rastreamento Sênior: Enviando o Lead para o CAPI e Pixel
+    await trackEvent("Lead", {
+      content_name: "Consultoria Gratuita Fusion Clinic",
+      content_category: formData.specialty,
+      value: 0.0,
+      currency: "BRL",
+    });
+
+    // 2. Simulação de Integração (Pode ser substituído por envio para CRM ou Email)
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setIsSubmitting(false);
+    setIsSuccess(true);
+
+    // Opcional: Redirecionar para o WhatsApp após o cadastro
+    const msg = encodeURIComponent(
+      `Olá! Sou o(a) ${formData.name} e acabei de solicitar uma consultoria de plano para a especialidade de ${formData.specialty}.`,
+    );
+    window.open(`https://wa.me/5511919119054?text=${msg}`, "_blank");
+  };
 
   return (
     <section className="relative py-24 overflow-hidden">
-      {/* Background */}
+      {/* Background Decorativo */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-background via-muted/30 to-background" />
-      <motion.div
-        animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.1, 0.2, 0.1],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute right-1/4 top-1/4 -z-10 h-[400px] w-[400px] rounded-full bg-primary/10 blur-3xl"
-      />
 
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-          {/* Left Content */}
+          {/* Lado Esquerdo: Texto de Autoridade */}
           <FadeInUp>
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
                 <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">Consultoria Gratuita</span>
+                <span className="text-sm font-medium text-primary">
+                  Consultoria Estratégica
+                </span>
               </div>
 
               <h2 className="text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl text-balance leading-tight">
-                Não sabe qual plano é o ideal?
+                Qual o melhor modelo de sala para o seu momento?
               </h2>
 
               <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-                Converse com nossos consultores para entender se o plano Hora, Turno ou Fixo traz mais ROI para sua carreira.
+                Nossos especialistas em Natal ajudam você a calcular qual plano
+                (Hora, Turno ou Fixo) traz o maior retorno financeiro para sua
+                agenda.
               </p>
 
               <ul className="space-y-3">
                 {benefits.map((benefit) => (
-                  <motion.li
-                    key={benefit}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4 }}
-                    className="flex items-center gap-3"
-                  >
+                  <li key={benefit} className="flex items-center gap-3">
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10">
                       <CheckCircle2 className="h-4 w-4 text-primary" />
                     </div>
-                    <span className="text-sm text-muted-foreground">{benefit}</span>
-                  </motion.li>
+                    <span className="text-sm text-muted-foreground">
+                      {benefit}
+                    </span>
+                  </li>
                 ))}
               </ul>
             </div>
           </FadeInUp>
 
-          {/* Right Form */}
+          {/* Lado Direito: Formulário de Alta Conversão */}
           <FadeInUp delay={0.2}>
-            <motion.div
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="relative overflow-hidden border-0 bg-card/80 backdrop-blur-xl shadow-2xl shadow-black/10 rounded-3xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
-                <div className="absolute top-0 right-0 h-32 w-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full" />
-                
-                <CardHeader className="relative pb-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80">
-                      <MessageCircle className="h-5 w-5 text-primary-foreground" />
-                    </div>
+            <Card className="relative overflow-hidden border-0 bg-card/80 backdrop-blur-xl shadow-2xl rounded-3xl">
+              <CardHeader className="relative pb-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80">
+                    <MessageCircle className="h-5 w-5 text-primary-foreground" />
                   </div>
-                  <CardTitle className="text-xl font-bold text-foreground">
-                    Receba uma consultoria grátis
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Preencha seus dados e entraremos em contato em até 24h
-                  </p>
-                </CardHeader>
+                </div>
+                <CardTitle className="text-xl font-bold">
+                  Falar com Especialista
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Entraremos em contato via WhatsApp em até 24h
+                </p>
+              </CardHeader>
 
-                <CardContent className="relative pt-4">
+              <CardContent className="relative pt-4">
+                {isSuccess ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-8 space-y-4"
+                  >
+                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 mb-2">
+                      <CheckCircle2 className="h-10 w-10" />
+                    </div>
+                    <h3 className="text-xl font-bold">Solicitação Enviada!</h3>
+                    <p className="text-muted-foreground">
+                      Estamos preparando sua análise de perfil. Redirecionando
+                      para o WhatsApp...
+                    </p>
+                  </motion.div>
+                ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-medium">
-                        Nome completo
-                      </Label>
+                      <Label htmlFor="name">Nome completo</Label>
                       <Input
                         id="name"
-                        placeholder="Dr(a). João Silva"
+                        placeholder="Dr(a). Nome Sobrenome"
                         value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="h-12 rounded-xl border-border/50 bg-background/50 focus:border-primary focus:ring-primary/20"
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        className="h-12 rounded-xl"
                         required
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="whatsapp" className="text-sm font-medium">
-                        WhatsApp
-                      </Label>
+                      <Label htmlFor="whatsapp">WhatsApp</Label>
                       <Input
                         id="whatsapp"
-                        placeholder="(11) 99999-9999"
+                        placeholder="(84) 99999-9999"
                         value={formData.whatsapp}
                         onChange={handleWhatsAppChange}
-                        className="h-12 rounded-xl border-border/50 bg-background/50 focus:border-primary focus:ring-primary/20"
+                        className="h-12 rounded-xl"
                         required
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="specialty" className="text-sm font-medium">
-                        Qual sua especialidade?
-                      </Label>
+                      <Label htmlFor="specialty">Sua Especialidade</Label>
                       <Select
                         value={formData.specialty}
-                        onValueChange={(value) => setFormData({ ...formData, specialty: value })}
+                        onValueChange={(v) =>
+                          setFormData({ ...formData, specialty: v })
+                        }
                       >
-                        <SelectTrigger className="h-12 w-full rounded-xl border-border/50 bg-background/50 focus:border-primary focus:ring-primary/20">
-                          <SelectValue placeholder="Selecione sua especialidade" />
+                        <SelectTrigger className="h-12 rounded-xl">
+                          <SelectValue placeholder="Selecione sua área" />
                         </SelectTrigger>
                         <SelectContent>
-                          {specialties.map((specialty) => (
-                            <SelectItem key={specialty} value={specialty.toLowerCase()}>
-                              {specialty}
+                          {specialties.map((s) => (
+                            <SelectItem key={s} value={s.toLowerCase()}>
+                              {s}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/25"
                     >
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="relative w-full h-13 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold shadow-lg shadow-primary/25"
-                      >
-                        <motion.div
-                          animate={isSubmitting ? {} : { scale: [1, 1.05, 1] }}
-                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                          className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80"
-                        />
-                        <span className="relative z-10">
-                          {isSubmitting ? "Enviando..." : "Quero falar com um especialista"}
-                        </span>
-                        {!isSubmitting && (
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            animate={{ x: ["-100%", "100%"] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                          />
-                        )}
-                      </Button>
-                    </motion.div>
-
-                    <p className="text-center text-xs text-muted-foreground">
-                      Seus dados estão seguros conosco. Sem spam, prometemos.
-                    </p>
+                      {isSubmitting
+                        ? "Processando..."
+                        : "Receber Consultoria Grátis"}
+                    </Button>
                   </form>
-                </CardContent>
-              </Card>
-            </motion.div>
+                )}
+              </CardContent>
+            </Card>
           </FadeInUp>
         </div>
       </div>
     </section>
-  )
+  );
 }
