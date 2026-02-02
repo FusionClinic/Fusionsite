@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Instagram, Facebook, Linkedin, Youtube, MessageCircle } from "lucide-react"
-import { FadeInUp } from "@/components/motion-wrapper"
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Instagram,
+  Facebook,
+  Linkedin,
+  Youtube,
+  MessageCircle,
+} from "lucide-react";
+import { FadeInUp } from "@/components/motion-wrapper";
 
 const footerLinks = {
   empresa: [
@@ -23,14 +29,14 @@ const footerLinks = {
     { label: "Política de Privacidade", href: "#privacidade" },
     { label: "Cookies", href: "#cookies" },
   ],
-}
+};
 
 const socialLinks = [
   { icon: Instagram, href: "#", label: "Instagram" },
   { icon: Facebook, href: "#", label: "Facebook" },
   { icon: Linkedin, href: "#", label: "LinkedIn" },
   { icon: Youtube, href: "#", label: "YouTube" },
-]
+];
 
 export function Footer() {
   return (
@@ -56,12 +62,18 @@ export function Footer() {
                     whileHover={{ scale: 1.05, rotate: 3 }}
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25"
                   >
-                    <span className="text-lg font-bold text-primary-foreground">F</span>
+                    <span className="text-lg font-bold text-primary-foreground">
+                      F
+                    </span>
                   </motion.div>
-                  <span className="text-xl font-bold text-white">Fusion Clinic</span>
+                  <span className="text-xl font-bold text-white">
+                    Fusion Clinic
+                  </span>
                 </Link>
                 <p className="text-sm text-gray-400 max-w-xs leading-relaxed">
-                  Conectamos profissionais da saúde a consultórios mobiliados com flexibilidade e economia.
+                  A maior rede de consultórios flexíveis de Natal e região.
+                  Conectamos profissionais a espaços premium no Tirol,
+                  Petrópolis e Lagoa Nova.
                 </p>
                 <div className="flex gap-2">
                   {socialLinks.map((social) => (
@@ -83,7 +95,9 @@ export function Footer() {
             {/* Links Columns */}
             <FadeInUp delay={0.1}>
               <div>
-                <h3 className="text-sm font-semibold text-white mb-5">Empresa</h3>
+                <h3 className="text-sm font-semibold text-white mb-5">
+                  Empresa
+                </h3>
                 <ul className="space-y-3">
                   {footerLinks.empresa.map((link) => (
                     <li key={link.label}>
@@ -101,7 +115,9 @@ export function Footer() {
 
             <FadeInUp delay={0.2}>
               <div>
-                <h3 className="text-sm font-semibold text-white mb-5">Recursos</h3>
+                <h3 className="text-sm font-semibold text-white mb-5">
+                  Recursos
+                </h3>
                 <ul className="space-y-3">
                   {footerLinks.recursos.map((link) => (
                     <li key={link.label}>
@@ -139,10 +155,10 @@ export function Footer() {
           <div className="mt-16 pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-sm text-gray-500">
-                {`© ${new Date().getFullYear()} Fusion Clinic. Todos os direitos reservados.`}
+                {`© ${new Date().getFullYear()} Fusion Clinic Natal. Todos os direitos reservados.`}
               </p>
               <p className="text-sm text-gray-500">
-                Feito com carinho para profissionais da saúde.
+                Feito com carinho em Natal - RN.
               </p>
             </div>
           </div>
@@ -151,7 +167,7 @@ export function Footer() {
 
       {/* WhatsApp Floating Button - Desktop only (Mobile has sticky CTA) */}
       <motion.a
-        href="https://wa.me/5511999999999?text=Olá! Gostaria de saber mais sobre os consultórios."
+        href="https://wa.me/5584999999999?text=Olá! Gostaria de saber mais sobre os consultórios em Natal."
         target="_blank"
         rel="noopener noreferrer"
         initial={{ scale: 0, opacity: 0 }}
@@ -159,11 +175,11 @@ export function Footer() {
         transition={{ delay: 1.5, type: "spring", stiffness: 200 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-6 right-6 z-50 hidden lg:flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30"
+        className="fixed bottom-6 right-6 z-50 hidden lg:flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#20bd5a] transition-colors"
         aria-label="Fale conosco pelo WhatsApp"
       >
         <MessageCircle className="h-6 w-6" />
       </motion.a>
     </>
-  )
+  );
 }

@@ -1,37 +1,48 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Star, Quote } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { FadeInUp, StaggerContainer, StaggerItem } from "@/components/motion-wrapper"
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Star, Quote } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  FadeInUp,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/motion-wrapper";
 
 const testimonials = [
   {
     id: 1,
     name: "Dra. Mariana Silva",
     role: "Psicóloga",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80",
     rating: 5,
-    review: "A Fusion Clinic transformou minha prática! Consegui expandir meu atendimento para outras regiões sem comprometer meu orçamento. Recomendo demais!",
+    review:
+      "Atendo meus pacientes no Tirol e a estrutura é impecável. O isolamento acústico das salas de psicologia da Fusion faz toda a diferença para minha prática.",
   },
   {
     id: 2,
     name: "Dr. Carlos Mendes",
     role: "Dentista",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&q=80",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&q=80",
     rating: 5,
-    review: "Consultórios impecáveis e equipamentos de primeira. Meus pacientes elogiam muito o ambiente. A flexibilidade de horários é um diferencial enorme.",
+    review:
+      "A sala odontológica já vem com autoclave e raio-x, o que me economizou um investimento gigante. Recomendo para quem está começando em Natal.",
   },
   {
     id: 3,
     name: "Dra. Ana Beatriz Costa",
     role: "Nutricionista",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80",
     rating: 5,
-    review: "Comecei minha carreira usando a Fusion Clinic e foi a melhor decisão. Zero dor de cabeça com infraestrutura e custos previsíveis todo mês.",
+    review:
+      "Localização perfeita em Petrópolis. Meus pacientes adoram a facilidade de estacionamento e a recepção. Zero dor de cabeça com boletos de aluguel.",
   },
-]
+];
 
 function GoogleIcon() {
   return (
@@ -53,7 +64,7 @@ function GoogleIcon() {
         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
       />
     </svg>
-  )
+  );
 }
 
 export function TestimonialsSection() {
@@ -69,8 +80,13 @@ export function TestimonialsSection() {
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <FadeInUp>
           <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 rounded-full border-primary/20 bg-primary/5 px-4 py-1.5">
-              <span className="text-sm font-medium text-primary">+2.000 profissionais ativos</span>
+            <Badge
+              variant="outline"
+              className="mb-4 rounded-full border-primary/20 bg-primary/5 px-4 py-1.5"
+            >
+              <span className="text-sm font-medium text-primary">
+                +300 profissionais em Natal
+              </span>
             </Badge>
             <h2 className="text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl">
               O Que Profissionais Acham Da{" "}
@@ -79,7 +95,8 @@ export function TestimonialsSection() {
               </span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Mais de 2.000 profissionais da saúde já transformaram suas carreiras com a Fusion Clinic.
+              Veja o que médicos e terapeutas de Natal estão falando sobre nossa
+              estrutura.
             </p>
           </div>
         </FadeInUp>
@@ -101,38 +118,46 @@ export function TestimonialsSection() {
                       <div className="flex items-center gap-3">
                         <motion.div
                           whileHover={{ scale: 1.1 }}
-                          className="relative"
+                          className="relative h-12 w-12"
                         >
-                          <img
+                          <Image
                             src={testimonial.avatar || "/placeholder.svg"}
                             alt={testimonial.name}
-                            className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20"
+                            fill
+                            className="rounded-full object-cover ring-2 ring-primary/20"
+                            sizes="48px"
                           />
-                          <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-green-500 border-2 border-card" />
+                          <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-green-500 border-2 border-card z-10" />
                         </motion.div>
                         <div>
-                          <p className="font-semibold text-foreground">{testimonial.name}</p>
-                          <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                          <p className="font-semibold text-foreground">
+                            {testimonial.name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {testimonial.role}
+                          </p>
                         </div>
                       </div>
                       <GoogleIcon />
                     </div>
 
                     <div className="flex gap-0.5">
-                      {Array.from({ length: testimonial.rating }).map((_, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, scale: 0 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: i * 0.1 }}
-                          viewport={{ once: true }}
-                        >
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        </motion.div>
-                      ))}
+                      {Array.from({ length: testimonial.rating }).map(
+                        (_, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, scale: 0 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: i * 0.1 }}
+                            viewport={{ once: true }}
+                          >
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          </motion.div>
+                        ),
+                      )}
                     </div>
 
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed italic">
                       {`"${testimonial.review}"`}
                     </p>
                   </CardContent>
@@ -143,5 +168,5 @@ export function TestimonialsSection() {
         </StaggerContainer>
       </div>
     </section>
-  )
+  );
 }

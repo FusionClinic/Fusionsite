@@ -1,186 +1,232 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Check, Zap, Star, Crown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { FadeInUp, StaggerContainer, StaggerItem } from "@/components/motion-wrapper"
+import { motion } from "framer-motion";
+import { Check, Zap, Star, Crown, ArrowRight, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  FadeInUp,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/motion-wrapper";
 
 const pricingPlans = [
   {
-    id: "hora",
-    name: "Por Hora",
-    tag: "Flexibilidade Máxima",
+    id: "avulso",
+    name: "Hora Avulsa",
+    tag: "Flexibilidade",
     tagIcon: Zap,
-    description: "Ideal para quem está começando ou tem agenda variável",
-    price: "R$35",
+    description:
+      "Pague apenas quando tiver paciente. Sem custos fixos mensais.",
+    price: "R$ 45",
     period: "/hora",
     popular: false,
+    highlightText: null,
     features: [
-      "Acesso a qualquer consultório disponível",
-      "Agendamento com até 24h de antecedência",
-      "Cancelamento gratuito até 2h antes",
-      "Wi-Fi e recepção inclusos",
-      "Suporte via WhatsApp",
+      "Agende e pague na hora",
+      "Liberdade total de agenda",
+      "Estrutura completa inclusa",
+      "Wi-Fi e recepção",
+      "Ideal para recém-formados",
     ],
-    cta: "Simular Hora",
+    cta: "Agendar Hora",
+    ctaLink: "/espacos",
   },
   {
-    id: "turno",
-    name: "Por Turno",
-    tag: "Mais Popular",
+    id: "plano10",
+    name: "Plano 10h",
+    tag: "Campeão de Vendas",
     tagIcon: Star,
-    description: "Perfeito para profissionais com dias fixos de atendimento",
-    price: "R$120",
-    period: "/turno",
+    description: "Atende toda semana? Garanta o melhor preço do mercado.",
+    price: "R$ 320",
+    period: "/mês",
     popular: true,
+    // GATILHO: Ancoragem de preço para mostrar valor
+    highlightText: "Economize R$ 130/mês",
     features: [
-      "Tudo do plano Por Hora",
-      "Turnos de 4h (manhã, tarde ou noite)",
-      "Economia de até 30% vs hora avulsa",
-      "Prioridade na escolha de sala",
-      "Desconto em turnos recorrentes",
-      "Sala de espera exclusiva",
+      "Sai a R$ 32,00/hora",
+      "Prioridade na agenda",
+      "Perfil em destaque no site",
+      "Créditos válidos por 30 dias",
+      "Pagamento mensal simplificado",
+      "Sem fidelidade (cancele quando quiser)",
     ],
-    cta: "Ver Turnos",
+    cta: "Quero Economizar",
+    ctaLink:
+      "https://wa.me/5584999999999?text=Olá! Quero saber mais sobre o Plano de 10h da Fusion.",
   },
   {
-    id: "fixo",
-    name: "Fixo/Mensal",
-    tag: "Sua sala exclusiva",
+    id: "exclusiva",
+    name: "Sala Exclusiva",
+    tag: "Personalizado",
     tagIcon: Crown,
-    description: "Para quem busca um espaço fixo com sua identidade",
-    price: "R$1.500",
-    period: "/mês",
+    description:
+      "Seu consultório próprio, 24h por dia, sem burocracia de imobiliária.",
+    price: "Sob Consulta",
+    period: "",
     popular: false,
+    highlightText: "Últimas unidades no Tirol",
     features: [
-      "Tudo dos planos anteriores",
-      "Sala exclusiva no endereço",
-      "Personalização do ambiente",
+      "Uso exclusivo (chave na mão)",
+      "Sua logo na porta",
+      "Decoração personalizada",
       "Acesso 24h, 7 dias por semana",
-      "Placa com seu nome na porta",
-      "Secretária compartilhada",
-      "Economia de até 50%",
+      "Endereço fiscal e comercial",
+      "Gestão predial inclusa",
     ],
-    cta: "Cotar Fixo",
+    cta: "Falar com Consultor",
+    ctaLink:
+      "https://wa.me/5584999999999?text=Tenho interesse em uma Sala Exclusiva mensal.",
   },
-]
+];
 
 export function PricingSection() {
   return (
-    <section id="precos" className="relative py-24 overflow-hidden bg-muted/30">
-      {/* Background */}
+    <section id="planos" className="relative py-24 overflow-hidden bg-muted/30">
+      {/* Background Decorativo */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
-        className="absolute -right-40 -top-40 h-80 w-80 rounded-full border border-primary/10 opacity-50"
+        className="absolute -right-40 -top-40 h-80 w-80 rounded-full border border-primary/10 opacity-50 pointer-events-none"
       />
       <motion.div
         animate={{ rotate: -360 }}
         transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
-        className="absolute -left-20 -bottom-20 h-60 w-60 rounded-full border border-primary/10 opacity-30"
+        className="absolute -left-20 -bottom-20 h-60 w-60 rounded-full border border-primary/10 opacity-30 pointer-events-none"
       />
 
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <FadeInUp>
           <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 rounded-full border-primary/20 bg-primary/5 px-4 py-1.5">
-              <span className="text-sm font-medium text-primary">Preços transparentes</span>
+            <Badge
+              variant="outline"
+              className="mb-4 rounded-full border-primary/20 bg-primary/5 px-4 py-1.5"
+            >
+              <span className="text-sm font-medium text-primary flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" /> Tabela Vigente 2026
+              </span>
             </Badge>
             <h2 className="text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl text-balance">
-              Liberdade para pagar como quiser
+              Planos que crescem com <br className="hidden md:block" />
+              <span className="text-primary">sua carreira</span>
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Escolha o modelo que melhor se adapta à sua rotina. Sem surpresas, sem taxas escondidas.
+              Do avulso ao consultório próprio. Comece pagando pouco e evolua
+              conforme sua agenda lota.
             </p>
           </div>
         </FadeInUp>
 
-        <StaggerContainer className="grid gap-6 lg:grid-cols-3">
+        <StaggerContainer className="grid gap-8 lg:grid-cols-3 items-start">
           {pricingPlans.map((plan) => (
             <StaggerItem key={plan.id}>
               <motion.div
-                whileHover={{ y: -12, scale: 1.02 }}
+                whileHover={{ y: -8 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
                 className="h-full"
               >
                 <Card
-                  className={`relative h-full overflow-hidden border-0 bg-card/80 backdrop-blur-sm shadow-xl rounded-3xl ${
+                  className={`relative h-full flex flex-col overflow-visible border-0 shadow-xl rounded-3xl transition-all ${
                     plan.popular
-                      ? "ring-2 ring-primary shadow-primary/20"
-                      : ""
+                      ? "bg-card ring-2 ring-primary shadow-primary/20 scale-105 z-10"
+                      : "bg-card/60 backdrop-blur-sm hover:bg-card/80"
                   }`}
                 >
                   {plan.popular && (
-                    <div className="absolute top-0 right-0 bg-gradient-to-l from-primary to-primary/80 px-4 py-1 text-xs font-semibold text-primary-foreground rounded-bl-2xl">
-                      Recomendado
+                    <div className="absolute -top-4 left-0 right-0 flex justify-center">
+                      <div className="bg-gradient-to-r from-primary to-primary/90 px-4 py-1.5 text-xs font-bold text-primary-foreground rounded-full shadow-lg flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-current" />
+                        Melhor Custo-Benefício
+                      </div>
                     </div>
                   )}
 
-                  <div className={`absolute inset-0 bg-gradient-to-br ${
-                    plan.popular 
-                      ? "from-primary/10 via-primary/5 to-transparent" 
-                      : "from-muted/50 to-transparent"
-                  }`} />
-
-                  <CardHeader className="relative pb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                        plan.popular 
-                          ? "bg-gradient-to-br from-primary to-primary/80" 
-                          : "bg-primary/10"
-                      }`}>
-                        <plan.tagIcon className={`h-4 w-4 ${plan.popular ? "text-primary-foreground" : "text-primary"}`} />
+                  <CardHeader className="pb-4 pt-8 px-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                          plan.popular
+                            ? "bg-primary/10 text-primary"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        <plan.tagIcon className="h-5 w-5" />
                       </div>
-                      <span className={`text-xs font-medium ${plan.popular ? "text-primary" : "text-muted-foreground"}`}>
+                      <span
+                        className={`text-sm font-bold tracking-wide uppercase ${plan.popular ? "text-primary" : "text-muted-foreground"}`}
+                      >
                         {plan.tag}
                       </span>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
+                    <h3 className="text-2xl font-bold text-foreground">
+                      {plan.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed min-h-[40px]">
+                      {plan.description}
+                    </p>
 
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                      <span className="text-sm text-muted-foreground">{plan.period}</span>
+                    <div className="mt-6 p-4 rounded-2xl bg-muted/50 border border-border/50">
+                      {plan.highlightText && (
+                        <div className="mb-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-sm">
+                            {plan.highlightText}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl font-extrabold text-foreground">
+                          {plan.price}
+                        </span>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {plan.period}
+                        </span>
+                      </div>
                     </div>
                   </CardHeader>
 
-                  <CardContent className="relative pt-0">
-                    <ul className="space-y-3 mb-8">
+                  <CardContent className="flex-1 flex flex-col px-6 pb-8">
+                    <ul className="space-y-4 mb-8 flex-1">
                       {plan.features.map((feature) => (
                         <li key={feature} className="flex items-start gap-3">
-                          <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full mt-0.5 ${
-                            plan.popular ? "bg-primary/20" : "bg-muted"
-                          }`}>
-                            <Check className={`h-3 w-3 ${plan.popular ? "text-primary" : "text-muted-foreground"}`} />
+                          <div
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full mt-0.5 ${
+                              plan.popular
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-primary/20 text-primary"
+                            }`}
+                          >
+                            <Check className="h-3 w-3" />
                           </div>
-                          <span className="text-sm text-muted-foreground">{feature}</span>
+                          <span className="text-sm text-foreground/80 font-medium">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
 
                     <motion.div
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <Button
-                        className={`relative w-full h-12 overflow-hidden rounded-xl font-semibold ${
+                        asChild
+                        className={`w-full h-12 rounded-xl font-bold text-base shadow-lg ${
                           plan.popular
-                            ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25"
-                            : "bg-foreground text-background hover:bg-foreground/90"
+                            ? "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-primary/25"
+                            : "bg-white dark:bg-zinc-800 text-foreground border-2 border-muted hover:border-primary/50"
                         }`}
                       >
-                        <span className="relative z-10">{plan.cta}</span>
-                        {plan.popular && (
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            initial={{ x: "-100%" }}
-                            whileHover={{ x: "100%" }}
-                            transition={{ duration: 0.5 }}
-                          />
-                        )}
+                        <a
+                          href={plan.ctaLink}
+                          target={
+                            plan.ctaLink.startsWith("http") ? "_blank" : "_self"
+                          }
+                        >
+                          {plan.cta}
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </a>
                       </Button>
                     </motion.div>
                   </CardContent>
@@ -189,7 +235,18 @@ export function PricingSection() {
             </StaggerItem>
           ))}
         </StaggerContainer>
+
+        {/* Link para ver tabela completa */}
+        <div className="mt-12 text-center">
+          <a
+            href="/planos"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
+          >
+            Ver comparativo completo e calculadora de economia
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       </div>
     </section>
-  )
+  );
 }

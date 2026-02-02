@@ -15,15 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import {
   Check,
-  X,
   Zap,
   Calendar,
   Crown,
   Clock,
-  Star,
   ArrowRight,
   TrendingUp,
   AlertCircle,
+  ShieldCheck,
 } from "lucide-react";
 import {
   Accordion,
@@ -32,13 +31,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-// DADOS OTIMIZADOS PARA VENDAS (Baseado no PDF)
+// DADOS OTIMIZADOS PARA VENDAS (Baseado em R$ 45/h)
 const plans = [
   {
     name: "Hora Avulsa",
     description:
-      "Medo de custos fixos? Pague apenas quando tiver paciente agendado.",
-    price: "R$ 40",
+      "Liberdade total. Pague apenas quando tiver paciente agendado.",
+    price: "R$ 45",
     period: "/hora",
     icon: Zap,
     popular: false,
@@ -54,13 +53,12 @@ const plans = [
   },
   {
     name: "Plano 10h",
-    description:
-      "Para quem atende pelo menos 1x na semana. Pare de perder dinheiro no avulso.",
+    description: "Atende semanalmente? Pare de perder dinheiro no avulso.",
     price: "R$ 320",
     period: "/mês",
-    // ANCORAGEM: 10h x R$40 = R$400
-    oldPrice: "R$ 400",
-    savings: "Economize R$ 80/mês",
+    // ANCORAGEM: 10h x R$45 = R$450
+    oldPrice: "R$ 450",
+    savings: "Economize R$ 130/mês",
     priceDetail: "Sai a R$ 32/hora",
     icon: Clock,
     popular: true,
@@ -68,33 +66,11 @@ const plans = [
       "Pacote de 10 horas mensais",
       "Prioridade na agenda",
       "Créditos válidos por 30 dias",
-      "Divulgação no nosso site",
+      "Perfil em destaque no site",
     ],
     cta: "Quero Economizar",
     color: "bg-primary",
-    badge: "Mais Vendido",
-  },
-  {
-    name: "Plano 20h",
-    description:
-      "Sua agenda lotou? Aumente sua margem de lucro reduzindo drasticamente seu custo.",
-    price: "R$ 580",
-    period: "/mês",
-    // ANCORAGEM: 20h x R$40 = R$800
-    oldPrice: "R$ 800",
-    savings: "Economia de R$ 220/mês",
-    priceDetail: "Apenas R$ 29/hora",
-    icon: Star,
-    popular: false,
-    features: [
-      "Menor custo por hora do mercado",
-      "Armário rotativo incluso",
-      "Gestão de correspondência",
-      "Perfil Gold no site",
-    ],
-    cta: "Migrar para o 20h",
-    color: "bg-purple-500",
-    badge: "Maior Lucro",
+    badge: "Melhor Custo-Benefício",
   },
   {
     name: "Turnos / Diárias",
@@ -102,7 +78,10 @@ const plans = [
       "Concentra pacientes em um dia só? Garanta sua sala fixa naquele dia.",
     price: "R$ 300",
     period: "/diária (10h)",
-    priceDetail: "R$ 30/hora",
+    // ANCORAGEM: 10h x R$45 = R$450
+    oldPrice: "R$ 450",
+    savings: "Economia de R$ 150/dia",
+    priceDetail: "Apenas R$ 30/hora",
     icon: Calendar,
     popular: false,
     features: [
@@ -124,7 +103,7 @@ const plans = [
     icon: Crown,
     popular: false,
     features: [
-      "Uso exclusivo 24h/7 dias",
+      "Uso exclusivo do espaço",
       "Sua logo na porta",
       "Endereço Fiscal e Comercial",
       "Móveis e Decor inclusos",
@@ -132,26 +111,26 @@ const plans = [
     cta: "Ver Salas Vagas",
     color: "bg-slate-800",
     // GATILHO DE ESCASSEZ
-    scarcity: "Últimas 2 unidades em Lagoa Nova",
+    scarcity: "Últimas unidades em Tirol",
     badge: "Premium",
   },
 ];
 
 const faqs = [
   {
-    question: "Como funcionam os pacotes de horas?",
+    question: "Como funciona o pacote de 10h?",
     answer:
-      "Você contrata um crédito de horas (10h ou 20h) para usar durante o mês. É como um plano de celular: você tem a liberdade de agendar essas horas quando quiser, garantindo um valor por hora muito mais baixo que o avulso.",
+      "Você contrata um crédito de 10 horas para usar durante o mês. É como um plano de celular: você tem a liberdade de agendar essas horas quando quiser, garantindo um valor por hora muito mais baixo (R$ 32/h) do que o avulso (R$ 45/h).",
   },
   {
     question: "As horas acumulam para o próximo mês?",
     answer:
-      "Os pacotes são mensais para garantir a disponibilidade da agenda. As horas devem ser utilizadas dentro do mês vigente, incentivando você a manter sua constância de atendimentos.",
+      "Os pacotes são mensais para garantir a disponibilidade da agenda para todos os profissionais. As horas devem ser utilizadas dentro do mês vigente.",
   },
   {
     question: "O que está incluso na Diária?",
     answer:
-      "A Diária contempla 10 horas consecutivas de uso da sala (ex: 08h às 18h) por um valor fixo de R$ 300. Ideal para quem concentra todos os atendimentos em um único dia da semana.",
+      "A Diária contempla o uso da sala durante todo o horário comercial (ex: 08h às 18h) por um valor fixo de R$ 300. Ideal para quem concentra todos os atendimentos em um único dia da semana.",
   },
   {
     question: "Preciso de fiador para a Sala Exclusiva?",
@@ -164,25 +143,39 @@ const faqs = [
 function SavingsSimulator() {
   const [hoursPerWeek, setHoursPerWeek] = useState(5);
 
-  // Cálculos
+  // Cálculos Baseados na nova hora avulsa de R$ 45
   const hoursPerMonth = hoursPerWeek * 4;
-  const costAvulso = hoursPerMonth * 40;
+  const costAvulso = hoursPerMonth * 45;
+
+  // Lógica Simplificada: Sempre compara com o Plano 10h ou Múltiplos dele
+  // Se atender mais de 10h, sugerimos múltiplos pacotes ou Turnos, mas para simplificar o calculo visual:
+  // Vamos assumir que a pessoa compraria Pacotes de 10h (R$ 320) + Horas Avulsas (R$ 45) para o excedente
+
+  const packsNeeded = Math.floor(hoursPerMonth / 10);
+  const remainingHours = hoursPerMonth % 10;
+
+  // Custo Otimizado: (Qtde Pacotes * 320) + (Horas Restantes * 45)
+  // Se a pessoa atende menos de 10h no mês, o comparativo é direto com o pacote mínimo para mostrar quanto ela perderia não assinando, ou se vale a pena avulso.
 
   let recommendedPlan = "Plano 10h";
-  let planCost = 320;
-  let hoursIncluded = 10;
+  let totalPlanCost = 0;
 
-  if (hoursPerMonth > 15) {
-    recommendedPlan = "Plano 20h";
-    planCost = 580;
-    hoursIncluded = 20;
+  if (hoursPerMonth <= 10) {
+    // Se atende pouco, compara o custo avulso com o custo do plano fixo (R$ 320)
+    // Às vezes o plano sai mais barato que o avulso se for > 7 horas (7 * 45 = 315)
+    totalPlanCost = 320;
+  } else {
+    totalPlanCost = packsNeeded * 320 + remainingHours * 45;
+    if (packsNeeded > 1) recommendedPlan = `${packsNeeded}x Planos 10h`;
   }
 
-  // Custo do plano + horas excedentes (se houver) no valor avulso
-  const extraHours = Math.max(0, hoursPerMonth - hoursIncluded);
-  const totalPlanCost = planCost + extraHours * 40;
+  // Se o custo do plano for maior que o avulso (ex: 2h por semana = 8h mês = R$ 360 avulso vs R$ 320 plano), o plano compensa.
+  // Se for 1h por semana = 4h mês = R$ 180 avulso. Plano não compensa.
+  // Ajuste visual para não mostrar "Economia Negativa"
 
-  const monthlySavings = costAvulso - totalPlanCost;
+  let monthlySavings = costAvulso - totalPlanCost;
+  if (monthlySavings < 0) monthlySavings = 0; // Não mostra negativo
+
   const yearlySavings = monthlySavings * 12;
 
   return (
@@ -194,10 +187,12 @@ function SavingsSimulator() {
           <Badge className="mb-4 bg-primary text-primary-foreground">
             Calculadora de Lucro
           </Badge>
-          <h3 className="text-2xl font-bold mb-4">Quanto você gasta hoje?</h3>
+          <h3 className="text-2xl font-bold mb-4">
+            Pare de deixar dinheiro na mesa
+          </h3>
           <p className="text-muted-foreground mb-8">
-            Arraste para selecionar quantas horas você atende por semana (em
-            média).
+            Arraste para ver quanto você economiza migrando do avulso para
+            nossos planos.
           </p>
 
           <div className="space-y-6">
@@ -210,7 +205,7 @@ function SavingsSimulator() {
             <Slider
               defaultValue={[5]}
               max={40}
-              min={1}
+              min={2} // Começa em 2h para fazer sentido o calculo
               step={1}
               onValueChange={(val) => setHoursPerWeek(val[0])}
               className="py-4"
@@ -224,8 +219,8 @@ function SavingsSimulator() {
         <div className="bg-background rounded-2xl p-6 shadow-sm border border-border/50">
           <div className="space-y-4">
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Custo no Avulso:</span>
-              <span className="line-throughdecoration-red-500">
+              <span>Custo no Avulso (R$ 45/h):</span>
+              <span className="line-through decoration-red-500">
                 R$ {costAvulso}
               </span>
             </div>
@@ -273,16 +268,16 @@ export default function PricingPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              Mais de 150 consultórios ativos esperando por você
+              Tabela vigente 2026
             </div>
 
             <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6 text-balance">
-              O plano inteligente para quem <br className="hidden md:block" />
-              <span className="text-primary">sabe até onde quer chegar</span>.
+              Planos feitos para o seu <br className="hidden md:block" />
+              <span className="text-primary">momento de carreira</span>.
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Comece no avulso, lucre com os pacotes e conquiste sua sala
-              exclusiva. Acompanhamos cada fase da sua jornada financeira.
+              Do recém-formado ao especialista com agenda cheia. Pague apenas
+              pelo que usar, com zero surpresas.
             </p>
           </motion.div>
         </div>
@@ -296,14 +291,14 @@ export default function PricingPage() {
       {/* Cards de Preço */}
       <section className="py-16 relative z-10">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-start">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`${index >= 3 ? "lg:col-span-1 xl:col-span-1" : ""}`}
+                className="h-full"
               >
                 <Card
                   className={`h-full flex flex-col relative overflow-visible transition-all duration-300 hover:shadow-2xl ${
@@ -356,13 +351,13 @@ export default function PricingPage() {
                       )}
 
                       {plan.oldPrice && (
-                        <span className="text-xs text-muted-foreground line-through decoration-red-400">
+                        <span className="text-xs text-muted-foreground line-through decoration-red-400 block mb-1">
                           De {plan.oldPrice}
                         </span>
                       )}
 
                       <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-bold text-foreground">
+                        <span className="text-3xl font-bold text-foreground">
                           {plan.price}
                         </span>
                         <span className="text-xs text-muted-foreground font-medium">
