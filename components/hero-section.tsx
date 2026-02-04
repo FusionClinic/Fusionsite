@@ -31,12 +31,12 @@ export function HeroSection() {
             <FadeInUp>
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary mb-4">
                 <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                Consultórios em Natal - Lagoa Nova
+                Consultórios em Natal
               </div>
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-balance leading-[1.1]">
                 Aluguel de{" "}
-                <span className="text-primary">Consultórios em Natal</span> por
-                Hora ou Turno
+                <span className="text-primary">Consultórios em Natal</span> com
+                flexibilidade
               </h1>
             </FadeInUp>
 
@@ -67,9 +67,9 @@ export function HeroSection() {
 
             <FadeInUp delay={0.2}>
               <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
-                Infraestrutura completa para médicos, psicólogos e profissionais
-                de saúde. Sem custos fixos e com flexibilidade total para sua
-                agenda em Natal-RN.
+                Infraestrutura completa para nutricinistas, médicos, psicólogos
+                e profissionais de saúde em geral. Sem custos fixos e com
+                flexibilidade total para sua agenda em Natal-RN.
               </p>
             </FadeInUp>
           </div>

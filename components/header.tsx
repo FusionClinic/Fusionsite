@@ -75,15 +75,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 animate-in fade-in slide-in-from-top-2 duration-500">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-8">
-        {/* ÁREA DA LOGO */}
-        <Link href="/" className="relative flex items-center">
-          <div className="relative h-10 w-40 md:h-12 md:w-48">
+        <Link href="/" className="relative flex items-center shrink-0">
+          <div className="relative h-16 w-56 md:h-20 md:w-72">
             <Image
-              src="/logo.png"
+              src="/logo1.png"
               alt="Fusion Clinic Logo"
               fill
               className="object-contain object-left"
               priority
+              sizes="(max-width: 768px) 200px, 300px"
             />
           </div>
         </Link>

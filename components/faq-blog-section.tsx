@@ -1,160 +1,203 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Calendar, HelpCircle, ChevronRight } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
-import { ArrowRight, Sparkles } from "lucide-react"
-import { FadeInUp, StaggerContainer, StaggerItem } from "@/components/motion-wrapper"
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardFooter,
+} from "@/components/ui/card";
+import { Post } from "@/lib/get-recent-posts";
 
+// FAQ Estático (Perguntas Frequentes não mudam toda hora)
 const faqs = [
   {
-    question: "Como funciona o sistema de reservas?",
-    answer: "É simples! Você escolhe o consultório, seleciona o horário disponível, realiza o pagamento online e pronto. Você receberá todas as instruções de acesso por e-mail e WhatsApp.",
+    question: "Preciso pagar taxa de condomínio ou luz?",
+    answer:
+      "Não. O valor da hora ou do turno já inclui todas as despesas: água, luz, internet, limpeza, recepcionista e IPTU. Você só paga pelo uso.",
   },
   {
-    question: "Posso cancelar uma reserva?",
-    answer: "Sim! Cancelamentos com até 24 horas de antecedência são reembolsados integralmente. Para cancelamentos com menos de 24 horas, aplicamos uma taxa de 50%.",
+    question: "Como funciona o agendamento de salas?",
+    answer:
+      "É 100% online. Após o cadastro aprovado, você acessa nosso sistema, vê a disponibilidade em tempo real e reserva o horário que precisa.",
   },
   {
-    question: "Os consultórios possuem equipamentos?",
-    answer: "Sim! Cada consultório é equipado de acordo com a especialidade. Consultórios odontológicos têm cadeira completa, salas médicas têm maca e equipamentos básicos, e salas de psicologia têm mobiliário adequado.",
+    question: "O contrato tem fidelidade?",
+    answer:
+      "Temos planos flexíveis. No modelo 'Pay-per-use' (por hora), não há fidelidade. Nos planos mensais de turnos fixos, o contrato é renovável a cada 6 meses.",
   },
   {
-    question: "Como me torno um anfitrião?",
-    answer: "Se você possui um consultório ocioso, pode cadastrá-lo na nossa plataforma. Faremos uma avaliação do espaço e, se aprovado, você começa a receber reservas e gerar renda extra.",
+    question: "Posso usar o endereço para divulgar meu trabalho?",
+    answer:
+      "Sim! Ao se tornar um membro Fusion (mesmo no plano por hora), você pode utilizar nosso endereço comercial em seus cartões de visita e Google Meu Negócio.",
   },
-]
+];
 
-const blogPosts = [
-  {
-    category: "Gestão",
-    title: "5 Dicas para Organizar sua Agenda de Atendimentos",
-    excerpt: "Aprenda estratégias práticas para otimizar seu tempo e atender mais pacientes.",
-  },
-  {
-    category: "Finanças",
-    title: "Como Reduzir Custos sem Perder Qualidade no Atendimento",
-    excerpt: "Descubra como a economia compartilhada está revolucionando a área da saúde.",
-  },
-  {
-    category: "Marketing",
-    title: "Instagram para Profissionais da Saúde: Guia Completo",
-    excerpt: "Construa sua presença digital e atraia novos pacientes de forma ética.",
-  },
-]
+interface FaqBlogSectionProps {
+  posts?: Post[];
+}
 
-export function FaqBlogSection() {
+export function FaqBlogSection({ posts = [] }: FaqBlogSectionProps) {
   return (
-    <section id="blog" className="py-24 bg-background">
+    <section className="py-24 bg-muted/30" id="faq">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid gap-16 lg:grid-cols-2">
-          {/* FAQ Column */}
-          <div className="space-y-8">
-            <FadeInUp>
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 mb-4">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Dúvidas frequentes</span>
-                </div>
-                <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
-                  Perguntas Frequentes
-                </h2>
-                <p className="mt-2 text-muted-foreground">
-                  Tire suas dúvidas sobre a Fusion Clinic.
-                </p>
-              </div>
-            </FadeInUp>
+        <div className="grid lg:grid-cols-2 gap-16">
+          {/* COLUNA DA ESQUERDA: FAQ */}
+          <div>
+            <div className="mb-10">
+              <Badge
+                variant="outline"
+                className="mb-4 bg-background text-primary border-primary/20"
+              >
+                <HelpCircle className="w-3 h-3 mr-1" /> Dúvidas Comuns
+              </Badge>
+              <h2 className="text-3xl font-bold tracking-tight mb-4">
+                Perguntas Frequentes
+              </h2>
+              <p className="text-muted-foreground">
+                Tudo o que você precisa saber sobre o funcionamento da Fusion
+                Clinic.
+              </p>
+            </div>
 
-            <FadeInUp delay={0.1}>
-              <Accordion type="single" collapsible className="w-full space-y-3">
-                {faqs.map((faq, index) => (
-                  <AccordionItem
-                    key={index}
-                    value={`item-${index}`}
-                    className="border border-border/50 rounded-2xl px-4 bg-card/50 backdrop-blur-sm data-[state=open]:bg-card data-[state=open]:shadow-md transition-all"
-                  >
-                    <AccordionTrigger className="text-left text-foreground hover:text-primary hover:no-underline py-4 [&[data-state=open]>svg]:text-primary">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pb-4 leading-relaxed">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </FadeInUp>
-
-            <FadeInUp delay={0.2}>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  className="rounded-xl border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground bg-transparent"
+            <Accordion type="single" collapsible className="w-full">
+              {faqs.map((faq, index) => (
+                <AccordionItem
+                  key={index}
+                  value={`item-${index}`}
+                  className="border-border/50"
                 >
-                  Mais Perguntas
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </motion.div>
-            </FadeInUp>
+                  <AccordionTrigger className="text-left font-semibold hover:text-primary transition-colors">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+
+            <div className="mt-8">
+              <p className="text-sm text-muted-foreground mb-4">
+                Ainda tem dúvidas?
+              </p>
+              <Button variant="outline" asChild className="rounded-xl">
+                <Link href="https://wa.me/5584999999999">
+                  Falar com Consultor
+                </Link>
+              </Button>
+            </div>
           </div>
 
-          {/* Blog Column */}
-          <div className="space-y-8">
-            <FadeInUp>
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 mb-4">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Blog</span>
-                </div>
-                <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
-                  Leia E Compartilhe Insights
-                </h2>
-                <p className="mt-2 text-muted-foreground">
-                  Conteúdo exclusivo para profissionais da saúde.
-                </p>
-              </div>
-            </FadeInUp>
-
-            <StaggerContainer className="space-y-4">
-              {blogPosts.map((post) => (
-                <StaggerItem key={post.title}>
-                  <motion.article
-                    whileHover={{ x: 8, scale: 1.01 }}
-                    transition={{ duration: 0.3 }}
-                    className="group p-5 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card hover:shadow-lg hover:border-primary/20 transition-all cursor-pointer"
+          {/* COLUNA DA DIREITA: BLOG (Dinâmico) */}
+          <div className="relative">
+            {/* Se não tiver posts, mostra um card genérico ou esconde */}
+            {posts.length > 0 ? (
+              <>
+                <div className="flex items-center justify-between mb-10">
+                  <div>
+                    <Badge
+                      variant="outline"
+                      className="mb-4 bg-background text-primary border-primary/20"
+                    >
+                      Blog
+                    </Badge>
+                    <h2 className="text-3xl font-bold tracking-tight">
+                      Leia e Compartilhe Insights
+                    </h2>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    asChild
+                    className="hidden sm:flex"
                   >
-                    <span className="inline-block text-xs font-semibold text-primary uppercase tracking-wide bg-primary/10 px-2 py-1 rounded-md">
-                      {post.category}
-                    </span>
-                    <h3 className="mt-3 text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                    <div className="mt-3 flex items-center gap-1 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                      Ler mais <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </motion.article>
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
+                    <Link href="/blog" className="gap-2 text-primary">
+                      Ver tudo <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                </div>
 
-            <FadeInUp delay={0.3}>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button className="rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/25">
-                  Acessar Blog
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </motion.div>
-            </FadeInUp>
+                <div className="space-y-6">
+                  {posts.map((post) => (
+                    <Link
+                      key={post.id}
+                      href={`/blog/${post.slug}`}
+                      className="block group"
+                    >
+                      <Card className="flex flex-col sm:flex-row overflow-hidden border-border/50 bg-background hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
+                        {/* Imagem Pequena */}
+                        <div className="relative h-48 sm:h-auto sm:w-48 shrink-0 overflow-hidden">
+                          <Image
+                            src={post.cover_image || "/placeholder.jpg"}
+                            alt={post.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        </div>
+
+                        {/* Conteúdo */}
+                        <div className="p-5 flex flex-col justify-center flex-1">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] h-5 px-2"
+                            >
+                              {post.category}
+                            </Badge>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(post.created_at).toLocaleDateString(
+                                "pt-BR",
+                              )}
+                            </span>
+                          </div>
+                          <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-tight">
+                            {post.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                            {post.excerpt}
+                          </p>
+                          <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Ler artigo <ChevronRight className="w-3 h-3" />
+                          </span>
+                        </div>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="mt-8 text-center sm:hidden">
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/blog">Ver todos os artigos</Link>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              // Fallback se não tiver posts (opcional)
+              <div className="h-full flex items-center justify-center border-2 border-dashed rounded-3xl border-muted p-10 text-center">
+                <div className="max-w-xs">
+                  <h3 className="text-lg font-bold mb-2">Blog em breve</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Estamos preparando conteúdos incríveis para impulsionar sua
+                    carreira.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

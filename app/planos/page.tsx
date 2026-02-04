@@ -212,7 +212,7 @@ function SavingsSimulator() {
       <div className="grid md:grid-cols-2 gap-10 items-center relative z-10">
         <div>
           <Badge className="mb-4 bg-primary text-primary-foreground">
-            Calculadora de Lucro
+            Calculadora de Economia
           </Badge>
           <h3 className="text-2xl font-bold mb-4">
             Pare de deixar dinheiro na mesa

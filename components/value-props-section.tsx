@@ -1,32 +1,40 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { DollarSign, Calendar, Building, Users } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { FadeInUp, StaggerContainer, StaggerItem } from "@/components/motion-wrapper"
+import { motion } from "framer-motion";
+import { DollarSign, Calendar, Building, Users } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  FadeInUp,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/motion-wrapper";
 
 const valueProps = [
   {
     icon: DollarSign,
     title: "Economia Inteligente",
-    description: "Pague apenas pelo tempo que usar. Sem custos fixos, sem desperdício. Ideal para quem está começando ou expandindo.",
+    description:
+      "Pague apenas pelo tempo que usar. Sem custos fixos, sem desperdício. Ideal para quem está começando ou expandindo.",
   },
   {
     icon: Calendar,
     title: "Flexibilidade Total",
-    description: "Agende por hora, turno ou período fixo. Adapte sua agenda às suas necessidades e atenda quando quiser.",
+    description:
+      "Agende por hora, turno ou período fixo. Adapte sua agenda às suas necessidades e atenda quando quiser.",
   },
   {
     icon: Building,
     title: "Estrutura Premium",
-    description: "Recepção, Wi-Fi de alta velocidade, limpeza e manutenção inclusos. Chegue e atenda com tranquilidade.",
+    description:
+      "Recepção, Wi-Fi de alta velocidade, limpeza e manutenção inclusos. Chegue e atenda com tranquilidade.",
   },
   {
     icon: Users,
     title: "Comunidade Fusion",
-    description: "Faça parte de uma rede de profissionais da saúde. Networking, indicações e oportunidades de crescimento.",
+    description:
+      "Faça parte de uma rede de profissionais da saúde. Networking, indicações e oportunidades de crescimento.",
   },
-]
+];
 
 export function ValuePropsSection() {
   return (
@@ -38,7 +46,8 @@ export function ValuePropsSection() {
               Chega De Custos Fixos E Contratos De Longo Prazo!
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              A Fusion Clinic oferece a solução perfeita para profissionais da saúde que buscam liberdade e economia.
+              A Fusion Clinic oferece a solução perfeita para profissionais da
+              saúde que buscam liberdade e economia.
             </p>
           </div>
         </FadeInUp>
@@ -74,5 +83,5 @@ export function ValuePropsSection() {
         </StaggerContainer>
       </div>
     </section>
-  )
+  );
 }

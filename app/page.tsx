@@ -6,11 +6,22 @@ import { HowItWorksSection } from "@/components/how-it-works-section";
 import { PricingSection } from "@/components/pricing-section";
 import { ListingsSection } from "@/components/listings-section";
 import { TestimonialsSection } from "@/components/testimonials-section";
-import { FaqBlogSection } from "@/components/faq-blog-section";
+import { FaqBlogSection } from "@/components/faq-blog-section"; // Componente Atualizado
 import { Footer } from "@/components/footer";
 import { StickyMobileCTA } from "@/components/sticky-mobile-cta";
+import { getFeaturedRooms } from "@/lib/get-featured-rooms";
+import { getRecentPosts } from "@/lib/get-recent-posts"; // <--- Importação Nova
 
-export default function HomePage() {
+// Cache ISR de 1 hora
+export const revalidate = 3600;
+
+export default async function HomePage() {
+  // Busca dados em paralelo para ser mais rápido
+  const [featuredRooms, recentPosts] = await Promise.all([
+    getFeaturedRooms(),
+    getRecentPosts(), // <--- Busca os posts
+  ]);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "HealthAndBeautyBusiness",
@@ -31,7 +42,7 @@ export default function HomePage() {
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: -5.8117973, // Coordenadas aproximadas para R. da Saudade, 762
+      latitude: -5.8117973,
       longitude: -35.2131972,
     },
     openingHoursSpecification: [
@@ -62,9 +73,15 @@ export default function HomePage() {
       <LeadGenSection />
       <HowItWorksSection />
       <PricingSection />
-      <ListingsSection />
+
+      {/* Dados reais de Salas */}
+      <ListingsSection rooms={featuredRooms} />
+
       <TestimonialsSection />
-      <FaqBlogSection />
+
+      {/* Dados reais de Blog */}
+      <FaqBlogSection posts={recentPosts} />
+
       <Footer />
       <StickyMobileCTA />
     </main>

@@ -1,10 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
-
-// Inicializa o cliente Supabase apenas para este arquivo se necessário, 
-// ou reutiliza o que você já tem em lib/supabase.ts
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from "@/lib/supabase";
 
 export type Post = {
   id: number;
@@ -12,7 +6,7 @@ export type Post = {
   slug: string;
   excerpt: string;
   content: string;
-  cover_image: string;
+  cover_image: string | null;
   author_name: string;
   category: string;
   created_at: string;
@@ -27,23 +21,38 @@ export async function getAllPosts() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Erro ao buscar posts:", error);
+    console.error("Erro ao buscar posts (lista):", error.message);
     return [];
   }
-  return data as Post[];
+  
+  // Filtragem de segurança: Remove posts sem slug para não quebrar o site
+  return (data as Post[]).filter(post => post.slug && post.slug !== 'undefined');
 }
 
 // Busca um post específico pelo Slug
 export async function getPostBySlug(slug: string) {
+  // Proteção: Se o slug for inválido, nem tenta buscar
+  if (!slug || slug === 'undefined' || slug === 'null') {
+    return null;
+  }
+
+  const cleanSlug = decodeURIComponent(slug);
+
   const { data, error } = await supabase
     .from("posts")
     .select("*")
-    .eq("slug", slug)
+    .eq("slug", cleanSlug)
+    .eq("published", true)
     .single();
 
   if (error) {
-    console.error("Erro ao buscar post:", error);
+    // Código PGRST116 significa "Nenhum resultado encontrado" (não é erro de sistema)
+    if (error.code === 'PGRST116') {
+      return null;
+    }
+    console.error(`Erro ao buscar post (slug: ${cleanSlug}):`, error.message);
     return null;
   }
+  
   return data as Post;
 }
