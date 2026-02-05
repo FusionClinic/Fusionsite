@@ -82,13 +82,14 @@ export default async function HomePage() {
       <ValuePropsSection />
 
       {/* Captura de Lead (Meio do Funil) */}
-      <LeadGenSection />
 
       {/* Explicação do Processo (Quebra de Objeção) */}
       <HowItWorksSection />
 
       {/* Oferta Irresistível (Preços Ancorados) */}
       <PricingSection />
+
+      <LeadGenSection />
 
       {/* Vitrine de Produtos (Escassez Visual) */}
       <ListingsSection rooms={featuredRooms} />

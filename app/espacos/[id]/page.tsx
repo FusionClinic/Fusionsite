@@ -20,6 +20,10 @@ import {
   Check,
   ChevronRight,
   Home,
+  Crown,
+  Sparkles,
+  TrendingDown,
+  ExternalLink,
 } from "lucide-react";
 import {
   Carousel,
@@ -107,8 +111,14 @@ export default async function RoomDetailsPage(props: {
   const displayImages = images.length > 0 ? images : ["/placeholder.jpg"];
   const mainPrice = room.price_per_hour || room.price_per_shift || 0;
 
-  // --- O SEGREDO DO SEO (JSON-LD) ---
-  // Isso faz o Google mostrar o preço e estrelas na busca
+  // --- ESTRATÉGIA DE PRECIFICAÇÃO ---
+  const PACKAGE_PRICE = 320; // Valor fixo do pacote
+  const PACKAGE_SAVINGS = 130; // Valor da economia
+  const PACKAGE_HOURLY_RATE = 32; // Valor por hora no pacote
+
+  // NÚMERO DO WHATSAPP
+  const WHATSAPP_NUMBER = "5511911199054";
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -132,13 +142,12 @@ export default async function RoomDetailsPage(props: {
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: room.rating || "5",
-      reviewCount: "12", // Fictício para cold start, ou puxe do banco se tiver
+      reviewCount: "12",
     },
   };
 
   return (
     <main className="min-h-screen bg-background">
-      {/* Script Invisível para o Google */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -146,7 +155,7 @@ export default async function RoomDetailsPage(props: {
 
       <Header />
 
-      {/* Breadcrumbs (Navegação SEO) */}
+      {/* Breadcrumbs */}
       <div className="bg-muted/30 border-b border-border/40">
         <div className="mx-auto max-w-7xl px-4 lg:px-8 py-3">
           <nav className="flex items-center text-sm text-muted-foreground">
@@ -168,7 +177,7 @@ export default async function RoomDetailsPage(props: {
         </div>
       </div>
 
-      {/* 1. Galeria de Fotos */}
+      {/* 1. Galeria de Fotos - AJUSTADA PARA QUADRADO/VERTICAL */}
       <section className="bg-muted/10 pt-6 pb-8">
         <div className="mx-auto max-w-7xl px-0 lg:px-8">
           <Carousel className="w-full relative group">
@@ -178,10 +187,10 @@ export default async function RoomDetailsPage(props: {
                   key={index}
                   className="basis-full md:basis-1/2 lg:basis-2/3 pl-4"
                 >
-                  <div className="relative aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-xl md:rounded-3xl border border-border/50 shadow-sm bg-muted">
+                  <div className="relative aspect-square md:aspect-[4/3] overflow-hidden rounded-xl md:rounded-3xl border border-border/50 shadow-sm bg-muted">
                     <Image
                       src={img}
-                      alt={`${room.name} - Consultório em ${room.neighborhood} - Foto ${index + 1}`}
+                      alt={`${room.name} - Foto ${index + 1}`}
                       fill
                       className="object-cover"
                       priority={index === 0}
@@ -200,9 +209,8 @@ export default async function RoomDetailsPage(props: {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 lg:px-8 py-8 grid lg:grid-cols-[1.5fr_1fr] gap-12 items-start">
-        {/* === COLUNA DA ESQUERDA: DETALHES === */}
+        {/* === COLUNA DA ESQUERDA === */}
         <div className="space-y-8">
-          {/* Cabeçalho do Imóvel */}
           <div>
             <div className="flex flex-wrap gap-2 mb-4">
               <Badge
@@ -230,7 +238,7 @@ export default async function RoomDetailsPage(props: {
 
             <Separator />
 
-            {/* Highlights Rápidos */}
+            {/* Highlights */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6">
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
@@ -266,7 +274,6 @@ export default async function RoomDetailsPage(props: {
             <Separator />
           </div>
 
-          {/* Descrição */}
           <div className="prose prose-stone dark:prose-invert max-w-none">
             <h3 className="text-xl font-bold mb-3 text-foreground">
               Sobre este espaço
@@ -276,7 +283,7 @@ export default async function RoomDetailsPage(props: {
             </p>
           </div>
 
-          {/* O que oferece (Amenities) */}
+          {/* Amenities */}
           <div className="bg-muted/30 p-6 rounded-2xl border border-border/50">
             <h3 className="text-xl font-bold mb-6 text-foreground">
               Comodidades Inclusas
@@ -312,103 +319,155 @@ export default async function RoomDetailsPage(props: {
           </div>
         </div>
 
-        {/* === COLUNA DA DIREITA: STICKY BOOKING CARD === */}
+        {/* === COLUNA DA DIREITA: BOOKING (NOVO CTA DE PACOTE) === */}
         <div className="relative h-full">
           <div className="sticky top-24">
-            <Card className="border-2 border-primary/10 shadow-2xl shadow-primary/5 overflow-hidden">
-              <div className="bg-primary/5 p-4 text-center border-b border-primary/10">
-                <p className="text-sm font-bold text-primary flex items-center justify-center gap-2 animate-pulse">
+            <Card className="border-0 shadow-2xl overflow-hidden ring-1 ring-border/50">
+              <div className="bg-muted p-4 text-center border-b border-border/50">
+                <p className="text-sm font-bold text-muted-foreground flex items-center justify-center gap-2">
                   <Clock className="w-4 h-4" />
-                  Últimos horários na semana!
+                  Reserve online ou via WhatsApp
                 </p>
               </div>
 
-              <CardContent className="p-6 space-y-6">
-                {/* Preços */}
-                <div className="space-y-3">
-                  {room.price_per_hour && (
-                    <div className="flex justify-between items-center p-4 rounded-xl border-2 border-muted hover:border-primary/50 cursor-pointer transition-all bg-background group">
-                      <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full border-2 border-muted group-hover:border-primary flex items-center justify-center">
-                          <div className="w-2.5 h-2.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                        <span className="font-medium">Hora Avulsa</span>
-                      </div>
-                      <span className="font-bold text-lg">
-                        {formatMoney(room.price_per_hour)}
+              <CardContent className="p-6 space-y-4">
+                {/* 1. OPÇÃO PACOTE (DESTACADA E FIXA) */}
+                <div className="relative group cursor-pointer transition-all hover:scale-[1.02]">
+                  {/* Borda Gradient Dourada */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 rounded-xl opacity-75 blur-[2px] group-hover:opacity-100 transition duration-200"></div>
+
+                  <div className="relative bg-background p-4 rounded-xl border border-amber-200 dark:border-amber-900/50">
+                    <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg shadow-sm flex items-center gap-1">
+                      <Crown className="w-3 h-3 fill-current" />
+                      MAIS VENDIDO
+                    </div>
+
+                    <div className="mb-2">
+                      <span className="text-amber-600 dark:text-amber-400 font-bold text-xs uppercase tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" />
+                        Pacote Flex 10h
                       </span>
                     </div>
+
+                    <div className="flex items-end justify-between mb-1">
+                      <div>
+                        <span className="block text-3xl font-extrabold text-foreground tracking-tight">
+                          {formatMoney(PACKAGE_PRICE)}
+                        </span>
+                        <span className="text-xs text-muted-foreground font-medium">
+                          Válido por 30 dias
+                        </span>
+                      </div>
+                      <div className="text-right flex flex-col items-end">
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-100 text-green-700 dark:bg-green-900/30 hover:bg-green-100 border-0 mb-1"
+                        >
+                          Economize {formatMoney(PACKAGE_SAVINGS)}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/10 px-2 py-1 rounded w-fit mb-4">
+                      <TrendingDown className="w-3 h-3" />
+                      Sai a {formatMoney(PACKAGE_HOURLY_RATE)}/hora
+                    </div>
+
+                    <Separator className="my-3 bg-amber-100 dark:bg-amber-900/30" />
+
+                    <Button
+                      size="sm"
+                      className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white border-0 font-bold shadow-md shadow-orange-500/20 h-10 text-base"
+                      asChild
+                    >
+                      <Link
+                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Tenho interesse no *Pacote de 10 Horas* (R$ 320) para a sala ${room.name}. Como funciona?`}
+                        target="_blank"
+                      >
+                        Quero este Pacote
+                        <ArrowRight className="ml-1 w-4 h-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 2. OPÇÕES CLICÁVEIS AGORA */}
+                <div className="space-y-3 pt-2">
+                  <p className="text-xs font-bold text-muted-foreground uppercase text-center mb-2">
+                    Ou pague avulso
+                  </p>
+
+                  {room.price_per_hour && (
+                    <Link
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Tenho interesse na *Hora Avulsa* para a sala ${room.name}. Qual a disponibilidade?`}
+                      target="_blank"
+                      className="group flex justify-between items-center p-3 rounded-lg border border-border hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium group-hover:text-primary transition-colors">
+                          Hora Avulsa
+                        </span>
+                        <ExternalLink className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <span className="font-bold">
+                        {formatMoney(room.price_per_hour)}
+                      </span>
+                    </Link>
                   )}
 
                   {room.price_per_shift && (
-                    <div className="flex justify-between items-center p-4 rounded-xl border-2 border-primary/30 bg-primary/5 cursor-pointer relative overflow-hidden">
-                      <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">
-                        RECOMENDADO
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-primary fill-primary/20" />
-                        <span className="font-bold text-foreground">
+                    <Link
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Tenho interesse no *Turno de 4h* para a sala ${room.name}. Qual a disponibilidade?`}
+                      target="_blank"
+                      className="group flex justify-between items-center p-3 rounded-lg border border-border hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium group-hover:text-primary transition-colors">
                           Turno (4h)
                         </span>
+                        <ExternalLink className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <div className="text-right">
-                        <span className="block font-bold text-xl text-primary">
+                      <div className="text-right leading-none">
+                        <span className="font-bold block">
                           {formatMoney(room.price_per_shift)}
                         </span>
-                        <span className="text-[10px] text-muted-foreground">
-                          Economia de 20%
+                        <span className="text-[10px] text-green-600 font-bold">
+                          -20% OFF
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   )}
                 </div>
 
-                <Separator />
-
-                {/* Botão de Conversão OTIMIZADO PARA WHATSAPP */}
-                <Button
-                  size="lg"
-                  className="w-full h-14 text-base font-bold rounded-xl shadow-xl shadow-green-500/20 bg-green-600 hover:bg-green-700 text-white transition-all hover:scale-[1.02]"
-                  asChild
-                >
-                  <Link
-                    href={`https://wa.me/5584999999999?text=Olá! Vi o consultório *${room.name}* no site e tenho interesse. Poderia me confirmar a disponibilidade?`}
-                    target="_blank"
-                  >
-                    Agendar Visita / Horário
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </Button>
-
-                {/* Garantias */}
-                <div className="bg-muted/30 p-4 rounded-xl space-y-3">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                    Garantia Fusion
+                <div className="mt-4 pt-4 border-t border-border/50 text-center">
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Prefere personalizar?
                   </p>
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 mt-0.5 text-green-500 shrink-0" />
-                    Sem fiador ou caução
-                  </div>
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 mt-0.5 text-green-500 shrink-0" />
-                    Cancele grátis (24h antes)
-                  </div>
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 mt-0.5 text-green-500 shrink-0" />
-                    Recepcionista inclusa
-                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full border-primary/20 hover:bg-primary/5 hover:text-primary"
+                    asChild
+                  >
+                    <Link
+                      href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                      className="font-bold"
+                      target="_blank"
+                    >
+                      Falar com Consultor
+                    </Link>
+                  </Button>
                 </div>
 
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground">
-                    Dúvidas?{" "}
-                    <Link
-                      href="https://wa.me/5584999999999"
-                      className="text-primary underline font-medium"
-                    >
-                      Fale com o suporte
-                    </Link>
-                  </p>
+                {/* Garantias */}
+                <div className="bg-muted/30 p-4 rounded-xl space-y-2 mt-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="w-3 h-3 text-green-500" />
+                    Sem fiador ou burocracia
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="w-3 h-3 text-green-500" />
+                    Sala climatizada e pronta
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -416,25 +475,30 @@ export default async function RoomDetailsPage(props: {
         </div>
       </section>
 
-      {/* Mobile Floating CTA (Fixo no celular) */}
+      {/* Mobile Floating CTA */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/90 backdrop-blur-xl border-t border-border/50 lg:hidden z-50 pb-8">
         <div className="flex gap-4 items-center max-w-md mx-auto">
           <div className="flex-1">
-            <span className="text-xs text-muted-foreground block uppercase font-bold tracking-wider">
-              A partir de
+            <span className="text-[10px] text-muted-foreground block uppercase font-bold tracking-wider">
+              Pacote Flex 10 horas
             </span>
-            <span className="font-extrabold text-2xl text-primary">
-              {formatMoney(mainPrice)}
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="font-extrabold text-xl text-amber-600">
+                {formatMoney(PACKAGE_PRICE)}
+              </span>
+              <span className="text-[10px] text-muted-foreground line-through decoration-red-500">
+                {formatMoney(PACKAGE_PRICE + PACKAGE_SAVINGS)}
+              </span>
+            </div>
           </div>
           <Button
-            className="flex-[1.5] h-12 rounded-xl font-bold shadow-lg bg-green-600 hover:bg-green-700 text-white"
+            className="flex-[1.5] h-12 rounded-xl font-bold shadow-lg bg-gradient-to-r from-amber-600 to-orange-600 text-white"
             asChild
           >
             <Link
-              href={`https://wa.me/5584999999999?text=Olá, quero reservar a sala ${room.name}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Olá, tenho interesse no pacote de 10h (R$ 320) da sala ${room.name}`}
             >
-              Reservar Agora
+              Garantir Pacote
             </Link>
           </Button>
         </div>
