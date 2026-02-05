@@ -1,16 +1,17 @@
 import { Header } from "@/components/header";
 import { HeroSection } from "@/components/hero-section";
+import { AuthorityBanner } from "@/components/authority-banner"; // Novo Componente de Autoridade
 import { ValuePropsSection } from "@/components/value-props-section";
 import { LeadGenSection } from "@/components/lead-gen-section";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { PricingSection } from "@/components/pricing-section";
 import { ListingsSection } from "@/components/listings-section";
 import { TestimonialsSection } from "@/components/testimonials-section";
-import { FaqBlogSection } from "@/components/faq-blog-section"; // Componente Atualizado
+import { FaqBlogSection } from "@/components/faq-blog-section";
 import { Footer } from "@/components/footer";
 import { StickyMobileCTA } from "@/components/sticky-mobile-cta";
 import { getFeaturedRooms } from "@/lib/get-featured-rooms";
-import { getRecentPosts } from "@/lib/get-recent-posts"; // <--- Importação Nova
+import { getRecentPosts } from "@/lib/get-recent-posts";
 
 // Cache ISR de 1 hora
 export const revalidate = 3600;
@@ -19,7 +20,7 @@ export default async function HomePage() {
   // Busca dados em paralelo para ser mais rápido
   const [featuredRooms, recentPosts] = await Promise.all([
     getFeaturedRooms(),
-    getRecentPosts(), // <--- Busca os posts
+    getRecentPosts(),
   ]);
 
   const jsonLd = {
@@ -27,11 +28,13 @@ export default async function HomePage() {
     "@type": "HealthAndBeautyBusiness",
     name: "Fusion Clinic",
     description:
-      "Aluguel de consultórios mobiliados em Natal para profissionais de saúde.",
+      "Aluguel de consultórios mobiliados em Natal para profissionais de saúde. Sem custos fixos.",
     image: "https://www.fusionclinic.com.br/og-image.jpg",
     "@id": "https://www.fusionclinic.com.br",
     url: "https://www.fusionclinic.com.br",
     telephone: "+5511919119054",
+    priceRange: "$$", // Adicionado para SEO
+    areaServed: "Natal, RN", // Adicionado para SEO Local
     address: {
       "@type": "PostalAddress",
       streetAddress: "R. da Saudade, 762",
@@ -68,18 +71,32 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Header />
+
+      {/* Bloco de Conversão Principal */}
       <HeroSection />
+
+      {/* Bloco de Autoridade Imediata (NOVO) */}
+      <AuthorityBanner />
+
+      {/* Proposta de Valor Racional */}
       <ValuePropsSection />
+
+      {/* Captura de Lead (Meio do Funil) */}
       <LeadGenSection />
+
+      {/* Explicação do Processo (Quebra de Objeção) */}
       <HowItWorksSection />
+
+      {/* Oferta Irresistível (Preços Ancorados) */}
       <PricingSection />
 
-      {/* Dados reais de Salas */}
+      {/* Vitrine de Produtos (Escassez Visual) */}
       <ListingsSection rooms={featuredRooms} />
 
+      {/* Prova Social Final */}
       <TestimonialsSection />
 
-      {/* Dados reais de Blog */}
+      {/* Conteúdo de Suporte/SEO */}
       <FaqBlogSection posts={recentPosts} />
 
       <Footer />
