@@ -93,7 +93,11 @@ export function Header() {
           {/* Menu Dropdown com POPOVER */}
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
             <PopoverTrigger asChild>
-              <button className="group flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors outline-none data-[state=open]:text-foreground">
+              {/* FIX: suppressHydrationWarning adicionado para evitar erro de ID do Radix */}
+              <button
+                suppressHydrationWarning
+                className="group flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors outline-none data-[state=open]:text-foreground"
+              >
                 Especialidades
                 <ChevronDown
                   className={`h-4 w-4 transition-transform duration-200 ${popoverOpen ? "rotate-180" : ""}`}
@@ -179,7 +183,13 @@ export function Header() {
         {/* Mobile Menu */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild className="lg:hidden">
-            <Button variant="ghost" size="icon" className="rounded-xl">
+            {/* FIX: suppressHydrationWarning adicionado aqui também */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
+              suppressHydrationWarning
+            >
               <Menu className="h-5 w-5" />
               <span className="sr-only">Abrir menu</span>
             </Button>

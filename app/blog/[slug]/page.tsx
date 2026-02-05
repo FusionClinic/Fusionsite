@@ -5,11 +5,22 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getPostBySlug } from "@/lib/blog";
+import { getPostBySlug, getAllPosts } from "@/lib/blog"; // Adicionado getAllPosts
 import { Calendar, User, ChevronLeft, ArrowRight } from "lucide-react";
 
 // Placeholder global
 const PLACEHOLDER_IMAGE = "/placeholder.jpg";
+
+// Configuração de ISR (Atualiza o cache a cada 1 hora)
+export const revalidate = 3600;
+
+// Otimização de SEO: Gera páginas estáticas no build
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 // Correção para Next.js 15+: params é uma Promise
 type Props = {
@@ -35,7 +46,7 @@ export default async function BlogPost({ params }: Props) {
 
   const slugRecebido = decodeURIComponent(slug);
 
-  // --- ÁREA DE DEBUG ---
+  // --- ÁREA DE DEBUG (Pode remover em produção se quiser) ---
   console.log("------------------------------------------------");
   console.log("🔎 TENTANDO ABRIR POST:");
   console.log("👉 Slug recebido (após await):", slugRecebido);
