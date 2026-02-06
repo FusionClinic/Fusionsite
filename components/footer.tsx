@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image"; // Importando o componente de imagem
 import { motion } from "framer-motion";
 import {
   Instagram,
@@ -57,18 +58,17 @@ export function Footer() {
             {/* Brand Column */}
             <FadeInUp>
               <div className="lg:col-span-2 space-y-5">
-                <Link href="/" className="flex items-center gap-2.5 group">
-                  <motion.div
-                    whileHover={{ scale: 1.05, rotate: 3 }}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25"
-                  >
-                    <span className="text-lg font-bold text-primary-foreground">
-                      F
-                    </span>
-                  </motion.div>
-                  <span className="text-xl font-bold text-white">
-                    Fusion Clinic
-                  </span>
+                <Link href="/" className="inline-block group">
+                  {/* SUBSTITUIÇÃO: Logo Imagem no lugar do Texto/Ícone */}
+                  <div className="relative h-12 w-48">
+                    <Image
+                      src="/logo1.png"
+                      alt="Fusion Clinic"
+                      fill
+                      className="object-contain object-left"
+                      priority
+                    />
+                  </div>
                 </Link>
                 <p className="text-sm text-gray-400 max-w-xs leading-relaxed">
                   A maior rede de consultórios flexíveis de Natal e região.
@@ -167,7 +167,7 @@ export function Footer() {
 
       {/* WhatsApp Floating Button - Desktop only (Mobile has sticky CTA) */}
       <motion.a
-        href="https://wa.me/5584999999999?text=Olá! Gostaria de saber mais sobre os consultórios em Natal."
+        href="https://wa.me/5511911195490?text=Olá! Gostaria de saber mais sobre os consultórios em Natal."
         target="_blank"
         rel="noopener noreferrer"
         initial={{ scale: 0, opacity: 0 }}

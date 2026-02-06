@@ -261,7 +261,7 @@ export default async function RoomDetailsPage(props: {
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
                   Internet
                 </span>
-                <p className="font-bold text-lg text-green-600">500 Mega</p>
+                <p className="font-bold text-lg text-green-600">Liberada</p>
               </div>
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
