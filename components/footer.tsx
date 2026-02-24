@@ -167,7 +167,7 @@ export function Footer() {
 
       {/* WhatsApp Floating Button - Desktop only (Mobile has sticky CTA) */}
       <motion.a
-        href="https://wa.me/5511911195490?text=Olá! Gostaria de saber mais sobre os consultórios em Natal."
+        href="https://wa.me/5511919119054?text=Olá! Gostaria de saber mais sobre os consultórios em Natal."
         target="_blank"
         rel="noopener noreferrer"
         initial={{ scale: 0, opacity: 0 }}

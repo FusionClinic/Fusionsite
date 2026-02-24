@@ -117,7 +117,7 @@ export default async function RoomDetailsPage(props: {
   const PACKAGE_HOURLY_RATE = 32; // Valor por hora no pacote
 
   // NÚMERO DO WHATSAPP
-  const WHATSAPP_NUMBER = "5511911199054";
+  const WHATSAPP_NUMBER = "5511919119054";
 
   const jsonLd = {
     "@context": "https://schema.org",
