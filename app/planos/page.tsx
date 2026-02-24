@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -12,7 +12,6 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
 import {
   Check,
   Zap,
@@ -22,7 +21,11 @@ import {
   ArrowRight,
   TrendingUp,
   AlertCircle,
-  CalendarClock, // NOVO ÍCONE
+  CalendarClock,
+  Info,
+  CalendarDays,
+  Shuffle,
+  Lightbulb,
 } from "lucide-react";
 import {
   Accordion,
@@ -56,7 +59,6 @@ const plans = [
     description: "Atende semanalmente? Pare de perder dinheiro no avulso.",
     price: "R$ 320",
     period: "/mês",
-    // ANCORAGEM: 10h x R$45 = R$450
     oldPrice: "R$ 450",
     savings: "Economize R$ 130/mês",
     priceDetail: "Sai a R$ 32/hora",
@@ -73,17 +75,16 @@ const plans = [
     badge: "Mais Vendido",
   },
   {
-    // NOVO PLANO TURNO FIXO
     name: "Turno Fixo",
     description:
       "4h por semana em dia e horário fixo (ex: Toda Terça à tarde).",
     price: "R$ 400",
     period: "/mês",
-    oldPrice: null, // Sem "De R$" pois é um produto novo
+    oldPrice: null,
     savings: "Menor valor por hora",
     priceDetail: "Apenas R$ 25/hora",
     icon: CalendarClock,
-    popular: false, // Deixamos o destaque visual, mas sem a tag "Mais Vendido" para não poluir
+    popular: false,
     features: [
       "Total de 16 horas mensais",
       "Sua sala garantida sempre",
@@ -92,10 +93,10 @@ const plans = [
     ],
     cta: "Garantir Turno",
     color: "bg-purple-500",
-    badge: "Melhor Custo", // Badge exclusiva
+    badge: "Melhor Custo",
   },
   {
-    name: "Diária (10h)", // RENOMEADO para clareza
+    name: "Diária (10h)",
     description:
       "Concentra todos os pacientes em um dia só? A sala é sua o dia todo.",
     price: "R$ 300",
@@ -131,7 +132,6 @@ const plans = [
     ],
     cta: "Ver Salas Vagas",
     color: "bg-slate-800",
-    // GATILHO DE ESCASSEZ
     scarcity: "Últimas unidades em Tirol",
     badge: "Premium",
   },
@@ -160,114 +160,324 @@ const faqs = [
   },
 ];
 
-// COMPONENTE: SIMULADOR DE ECONOMIA
+// OPÇÕES SEPARADAS POR TIPO DE AGENDA
+const FLEXIBLE_PLANS = [
+  { name: "Hora Avulsa", hours: 1, price: 45 },
+  { name: "Pacote 10h", hours: 10, price: 320 },
+  { name: "Pacote 20h", hours: 20, price: 580 },
+];
+
+const FIXED_PLANS = [
+  ...FLEXIBLE_PLANS,
+  { name: "Diária (10h seguidas)", hours: 10, price: 300 },
+  { name: "Turno Fixo (16h)", hours: 16, price: 397.99 },
+  { name: "Dois Turnos Fixos (32h)", hours: 32, price: 640 },
+];
+
+// COMPONENTE: SIMULADOR DE ECONOMIA INTELIGENTE
 function SavingsSimulator() {
-  const [hoursPerWeek, setHoursPerWeek] = useState(5);
+  const [hoursPerMonth, setHoursPerMonth] = useState<number | "">(16);
+  const [agendaType, setAgendaType] = useState<"flexible" | "fixed">(
+    "flexible",
+  );
 
-  const hoursPerMonth = hoursPerWeek * 4;
-  const costAvulso = hoursPerMonth * 45;
+  const bestPlan = useMemo(() => {
+    const target = Number(hoursPerMonth) || 0;
+    if (target <= 0)
+      return {
+        cost: 0,
+        planName: "Nenhum",
+        savings: 0,
+        avulsoCost: 0,
+        isUpsell: false,
+        extraHours: 0,
+      };
 
-  const packsNeeded = Math.floor(hoursPerMonth / 10);
-  const remainingHours = hoursPerMonth % 10;
+    const avulsoCost = target * 45;
+    const maxSearchHours = target + 40;
 
-  let recommendedPlan = "Plano 10h";
-  let totalPlanCost = 0;
+    const activePlans =
+      agendaType === "flexible" ? FLEXIBLE_PLANS : FIXED_PLANS;
 
-  // Lógica de recomendação atualizada
-  if (hoursPerMonth <= 8) {
-    // Até 8h/mês, avulso ou pacote pequeno
-    if (hoursPerMonth < 8) {
-      totalPlanCost = hoursPerMonth * 45; // Avulso compensa
-      recommendedPlan = "Hora Avulsa";
-    } else {
-      totalPlanCost = 320; // 8h avulso (360) > Plano 10h (320)
+    const dp = Array(maxSearchHours + 1).fill(Infinity);
+    const planChoice = Array(maxSearchHours + 1).fill(null);
+    const prevHour = Array(maxSearchHours + 1).fill(0);
+
+    dp[0] = 0;
+
+    for (let i = 0; i <= maxSearchHours; i++) {
+      if (dp[i] === Infinity) continue;
+      for (const plan of activePlans) {
+        const nextHour = i + plan.hours;
+        if (nextHour <= maxSearchHours && dp[i] + plan.price < dp[nextHour]) {
+          dp[nextHour] = dp[i] + plan.price;
+          planChoice[nextHour] = plan;
+          prevHour[nextHour] = i;
+        }
+      }
     }
-  } else if (hoursPerMonth >= 16 && hoursPerMonth <= 20) {
-    // Faixa ideal do Turno Fixo (16h)
-    // Se a pessoa atende 4h/semana = 16h/mês
-    // Custo avulso: 720 | Custo Turno: 400
-    totalPlanCost = 400;
-    recommendedPlan = "Turno Fixo (16h)";
-  } else {
-    // Regra geral dos pacotes
-    totalPlanCost = packsNeeded * 320 + remainingHours * 45;
-    if (packsNeeded >= 1)
-      recommendedPlan = `${packsNeeded}x Planos 10h + Avulso`;
-  }
 
-  // Ajuste para não bugar o visual se o recomendado for o próprio avulso
-  if (recommendedPlan === "Hora Avulsa") {
-    totalPlanCost = costAvulso;
-  }
+    let minCost = Infinity;
+    let bestHour = target;
+    for (let i = target; i <= maxSearchHours; i++) {
+      if (dp[i] < minCost) {
+        minCost = dp[i];
+        bestHour = i;
+      }
+    }
 
-  let monthlySavings = costAvulso - totalPlanCost;
-  if (monthlySavings < 0) monthlySavings = 0;
+    let curr = bestHour;
+    const planCounts: Record<string, number> = {};
+    while (curr > 0) {
+      const p = planChoice[curr];
+      if (!p) break;
+      planCounts[p.name] = (planCounts[p.name] || 0) + 1;
+      curr = prevHour[curr];
+    }
 
-  const yearlySavings = monthlySavings * 12;
+    let planNames = Object.entries(planCounts).map(([name, count]) =>
+      count > 1 ? `${count}x ${name}` : name,
+    );
+
+    let finalCost = minCost;
+    let finalPlanName = planNames.join(" + ") || "Hora Avulsa";
+    let isUpsell = false;
+    let extraHours = 0;
+
+    // LÓGICA DE UPSELL ESTRATÉGICO: Entre 5 e 7 horas
+    // Com 8 horas o avulso (360) já é mais caro que o pacote (320), então cai na economia natural.
+    if (target >= 5 && target <= 7) {
+      finalCost = 320; // Preço do pacote 10h
+      finalPlanName = "Pacote 10h";
+      isUpsell = true;
+      extraHours = 10 - target; // Calcula quantas horas sobram para ela usar na clínica
+    }
+
+    const savings = avulsoCost - finalCost;
+
+    return {
+      cost: finalCost,
+      planName: finalPlanName,
+      savings: savings > 0 ? savings : 0,
+      avulsoCost,
+      isUpsell,
+      extraHours,
+    };
+  }, [hoursPerMonth, agendaType]);
+
+  const yearlySavings = bestPlan.savings * 12;
 
   return (
-    <div className="mx-auto max-w-4xl bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-8 border border-primary/20 shadow-xl overflow-hidden relative">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+    <div className="mx-auto max-w-4xl bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-6 md:p-10 border border-primary/20 shadow-xl overflow-hidden relative">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-      <div className="grid md:grid-cols-2 gap-10 items-center relative z-10">
-        <div>
-          <Badge className="mb-4 bg-primary text-primary-foreground">
-            Calculadora de Economia
-          </Badge>
-          <h3 className="text-2xl font-bold mb-4">
-            Pare de deixar dinheiro na mesa
-          </h3>
-          <p className="text-muted-foreground mb-8">
-            Simule quantas horas você atende por semana e veja a economia real.
-          </p>
+      <div className="grid md:grid-cols-2 gap-10 items-start relative z-10">
+        <div className="space-y-6">
+          <div>
+            <Badge className="mb-4 bg-primary text-primary-foreground shadow-md">
+              Calculadora Inteligente
+            </Badge>
+            <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">
+              Sua estratégia ideal
+            </h3>
+            <p className="text-muted-foreground text-sm">
+              Descubra a combinação mais barata para o seu volume de pacientes.
+            </p>
+          </div>
 
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Horas Semanais:</span>
-              <span className="text-2xl font-bold text-primary">
-                {hoursPerWeek}h / semana
+          <div className="space-y-3">
+            <label className="font-semibold text-sm text-foreground">
+              1. Qual o seu perfil de agenda?
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={() => setAgendaType("flexible")}
+                className={`flex flex-col items-start p-3 rounded-xl border-2 transition-all text-left ${
+                  agendaType === "flexible"
+                    ? "border-primary bg-primary/10 ring-1 ring-primary/20"
+                    : "border-border bg-background hover:border-primary/40"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Shuffle
+                    className={`w-4 h-4 ${agendaType === "flexible" ? "text-primary" : "text-muted-foreground"}`}
+                  />
+                  <span className="text-sm font-bold text-foreground">
+                    Dias Variados
+                  </span>
+                </div>
+                <span className="text-[11px] text-muted-foreground leading-tight">
+                  Atendo 1h hoje, 2h amanhã... Preciso de flexibilidade.
+                </span>
+              </button>
+
+              <button
+                onClick={() => setAgendaType("fixed")}
+                className={`flex flex-col items-start p-3 rounded-xl border-2 transition-all text-left ${
+                  agendaType === "fixed"
+                    ? "border-primary bg-primary/10 ring-1 ring-primary/20"
+                    : "border-border bg-background hover:border-primary/40"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <CalendarDays
+                    className={`w-4 h-4 ${agendaType === "fixed" ? "text-primary" : "text-muted-foreground"}`}
+                  />
+                  <span className="text-sm font-bold text-foreground">
+                    Concentrada
+                  </span>
+                </div>
+                <span className="text-[11px] text-muted-foreground leading-tight">
+                  Consigo juntar pacientes no mesmo dia ou turno.
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <label className="font-semibold text-sm text-foreground">
+              2. Quantas horas atende por mês?
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                max="300"
+                value={hoursPerMonth}
+                onChange={(e) =>
+                  setHoursPerMonth(e.target.value ? Number(e.target.value) : "")
+                }
+                className="flex h-14 w-full rounded-xl border-2 border-primary/20 bg-background px-4 py-2 text-2xl font-bold text-primary ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
+                placeholder="Ex: 20"
+              />
+              <span className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold">
+                horas / mês
               </span>
             </div>
-            <Slider
-              defaultValue={[5]}
-              max={40}
-              min={2}
-              step={1}
-              onValueChange={(val) => setHoursPerWeek(val[0])}
-              className="py-4"
-            />
-            <p className="text-sm text-muted-foreground">
-              Total mensal estimado: <strong>{hoursPerMonth} horas</strong>
-            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {[6, 10, 16, 20, 32].map((h) => (
+                <Button
+                  key={h}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setHoursPerMonth(h)}
+                  className="rounded-full h-7 text-xs border-primary/20 hover:bg-primary/10 hover:text-primary transition-colors"
+                >
+                  {h}h
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="bg-background rounded-2xl p-6 shadow-sm border border-border/50">
-          <div className="space-y-4">
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Custo no Avulso (R$ 45/h):</span>
-              <span className="line-through decoration-red-500">
-                R$ {costAvulso}
-              </span>
-            </div>
-            <div className="flex justify-between items-center font-bold text-lg">
-              <span>Melhor opção: {recommendedPlan}</span>
-              <span className="text-primary">R$ {totalPlanCost}</span>
-            </div>
+        <div className="bg-background rounded-2xl p-6 md:p-8 shadow-sm border border-border/50 h-full flex flex-col justify-center">
+          <div className="space-y-5">
+            {bestPlan.isUpsell && bestPlan.avulsoCost < bestPlan.cost ? (
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">
+                  Custo das {hoursPerMonth}h no avulso:
+                </span>
+                <span className="text-lg text-muted-foreground font-medium">
+                  R${" "}
+                  {bestPlan.avulsoCost.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">
+                  Custo pagando Avulso:
+                </span>
+                <span className="text-lg line-through decoration-red-500 text-muted-foreground font-medium">
+                  R${" "}
+                  {bestPlan.avulsoCost.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+            )}
 
-            <div className="pt-4 border-t border-border">
-              <div className="bg-green-100 dark:bg-green-900/30 p-4 rounded-xl text-center space-y-1">
-                <p className="text-sm font-medium text-green-800 dark:text-green-300">
-                  Sua Economia Anual
-                </p>
-                <p className="text-3xl font-extrabold text-green-600 dark:text-green-400">
-                  R$ {yearlySavings.toLocaleString("pt-BR")}
-                </p>
-                <p className="text-xs text-green-700 dark:text-green-500">
-                  Investimento que vira lucro.
-                </p>
+            <div
+              className={`p-4 rounded-xl border ${bestPlan.isUpsell ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800" : "bg-primary/5 border-primary/10"}`}
+            >
+              <div
+                className={`text-xs font-bold uppercase tracking-wider mb-1 ${bestPlan.isUpsell ? "text-blue-600 dark:text-blue-400" : "text-primary"}`}
+              >
+                Sua Melhor Opção
+              </div>
+              <div className="text-lg font-bold leading-tight mb-3">
+                {bestPlan.planName}
+              </div>
+              <div className="flex justify-between items-end">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Valor otimizado:
+                </span>
+                <span
+                  className={`text-3xl font-extrabold ${bestPlan.isUpsell ? "text-blue-600 dark:text-blue-400" : "text-primary"}`}
+                >
+                  R${" "}
+                  {bestPlan.cost.toLocaleString("pt-BR", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
               </div>
             </div>
+
+            <div className="pt-2">
+              {bestPlan.isUpsell ? (
+                /* CARD DE UPSELL - EDUCATIVO */
+                <div className="bg-blue-100 dark:bg-blue-900/30 p-5 rounded-xl text-center space-y-2 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-blue-200/50 dark:bg-blue-800/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-center gap-1.5 text-sm font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wide mb-1">
+                      <Lightbulb className="w-4 h-4" />
+                      Visão de Negócio
+                    </div>
+                    <p className="text-lg font-bold text-blue-700 dark:text-blue-400 leading-tight">
+                      Ganhe {bestPlan.extraHours}{" "}
+                      {bestPlan.extraHours === 1
+                        ? "hora livre"
+                        : "horas livres"}{" "}
+                      para crescer!
+                    </p>
+                    <p className="text-xs font-medium text-blue-800/80 dark:text-blue-300 mt-2 leading-relaxed">
+                      Ao invés de pagar avulso, garanta o{" "}
+                      <strong>Pacote 10h</strong>. Use o tempo livre no seu
+                      consultório para gravar vídeos, conversar com nossos
+                      profissionais e captar novos pacientes.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                /* CARD DE ECONOMIA PADRÃO */
+                <div className="bg-green-100 dark:bg-green-900/30 p-5 rounded-xl text-center space-y-1 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-green-200/50 dark:bg-green-800/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-center gap-1.5 text-sm font-bold text-green-800 dark:text-green-300 uppercase tracking-wide mb-1">
+                      <TrendingUp className="w-4 h-4" />
+                      Sua Economia Anual
+                    </div>
+                    <p className="text-4xl font-black text-green-600 dark:text-green-400 my-2">
+                      R${" "}
+                      {yearlySavings.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </p>
+                    <p className="text-xs font-medium text-green-700/80 dark:text-green-500">
+                      Lucro retido direto no seu bolso.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <p className="text-[10px] text-muted-foreground/70 flex items-start gap-1.5 leading-tight mt-4">
+              <Info className="w-3.5 h-3.5 shrink-0" />
+              {agendaType === "flexible"
+                ? "Como você selecionou 'Dias Variados', nossa IA otimizou o valor focando exclusivamente nos nossos Bancos de Horas (Pacotes)."
+                : "Como você pode concentrar a agenda, nossa IA buscou o menor custo absoluto incluindo opções de Turno Fixo e Diárias."}
+            </p>
           </div>
         </div>
       </div>
@@ -280,7 +490,7 @@ export default function PricingPage() {
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section com Prova Social */}
+      {/* Hero Section */}
       <section className="relative py-20 lg:py-24 overflow-hidden bg-muted/30">
         <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
         <div className="mx-auto max-w-7xl px-4 lg:px-8 text-center">
@@ -309,12 +519,12 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Simulador (Hook de Conversão) */}
+      {/* Simulador */}
       <section className="py-10 px-4">
         <SavingsSimulator />
       </section>
 
-      {/* Cards de Preço - LAYOUT ATUALIZADO PARA 5 COLUNAS EM TELA GRANDE */}
+      {/* Cards de Preço */}
       <section className="py-16 relative z-10">
         <div className="mx-auto max-w-[1400px] px-4 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-start">
@@ -368,7 +578,6 @@ export default function PricingPage() {
                   </CardHeader>
 
                   <CardContent className="flex-grow pt-0">
-                    {/* ÁREA DE PREÇO COM ANCORAGEM */}
                     <div className="mb-6 p-3 bg-muted/40 rounded-xl border border-border/50 relative group-hover:bg-primary/5 transition-colors">
                       {plan.savings && (
                         <div className="absolute -top-2.5 right-2 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-200">
@@ -401,7 +610,6 @@ export default function PricingPage() {
                       )}
                     </div>
 
-                    {/* ESCASSEZ PARA SALA EXCLUSIVA */}
                     {plan.scarcity && (
                       <div className="mb-4 flex items-center gap-2 text-xs font-medium text-amber-700 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 p-2 rounded-lg border border-amber-200/50">
                         <AlertCircle className="w-3 h-3" />
