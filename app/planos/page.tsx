@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,9 @@ import {
   CalendarDays,
   Shuffle,
   Lightbulb,
+  Sparkles,
+  Loader2,
+  RefreshCcw,
 } from "lucide-react";
 import {
   Accordion,
@@ -174,12 +177,34 @@ const FIXED_PLANS = [
   { name: "Dois Turnos Fixos (32h)", hours: 32, price: 640 },
 ];
 
-// COMPONENTE: SIMULADOR DE ECONOMIA INTELIGENTE
+// COMPONENTE: SIMULADOR DE ECONOMIA WIZARD
 function SavingsSimulator() {
-  const [hoursPerMonth, setHoursPerMonth] = useState<number | "">(16);
-  const [agendaType, setAgendaType] = useState<"flexible" | "fixed">(
-    "flexible",
+  const [step, setStep] = useState(0);
+  const [hoursPerMonth, setHoursPerMonth] = useState<number | "">("");
+  const [agendaType, setAgendaType] = useState<"flexible" | "fixed" | null>(
+    null,
   );
+
+  const handleStart = () => setStep(1);
+
+  const handleAgendaSelect = (type: "flexible" | "fixed") => {
+    setAgendaType(type);
+    setStep(2);
+  };
+
+  const handleCalculate = () => {
+    if (!hoursPerMonth || hoursPerMonth <= 0) return;
+    setStep(3);
+    setTimeout(() => {
+      setStep(4);
+    }, 1800);
+  };
+
+  const handleReset = () => {
+    setStep(0);
+    setHoursPerMonth("");
+    setAgendaType(null);
+  };
 
   const bestPlan = useMemo(() => {
     const target = Number(hoursPerMonth) || 0;
@@ -245,12 +270,11 @@ function SavingsSimulator() {
     let extraHours = 0;
 
     // LÓGICA DE UPSELL ESTRATÉGICO: Entre 5 e 7 horas
-    // Com 8 horas o avulso (360) já é mais caro que o pacote (320), então cai na economia natural.
     if (target >= 5 && target <= 7) {
-      finalCost = 320; // Preço do pacote 10h
+      finalCost = 320;
       finalPlanName = "Pacote 10h";
       isUpsell = true;
-      extraHours = 10 - target; // Calcula quantas horas sobram para ela usar na clínica
+      extraHours = 10 - target;
     }
 
     const savings = avulsoCost - finalCost;
@@ -267,220 +291,345 @@ function SavingsSimulator() {
 
   const yearlySavings = bestPlan.savings * 12;
 
+  // Variantes tipadas com Variants
+  const fadeVariants: Variants = {
+    initial: { opacity: 0, y: 10, scale: 0.98 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.4, ease: "easeOut" },
+    },
+    exit: {
+      opacity: 0,
+      y: -10,
+      scale: 0.98,
+      transition: { duration: 0.3, ease: "easeIn" },
+    },
+  };
+
   return (
-    <div className="mx-auto max-w-4xl bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-6 md:p-10 border border-primary/20 shadow-xl overflow-hidden relative">
+    <div className="mx-auto max-w-2xl bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-6 md:p-10 border border-primary/20 shadow-xl overflow-hidden relative min-h-[420px] flex flex-col justify-center">
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-      <div className="grid md:grid-cols-2 gap-10 items-start relative z-10">
-        <div className="space-y-6">
-          <div>
-            <Badge className="mb-4 bg-primary text-primary-foreground shadow-md">
-              Calculadora Inteligente
+      <AnimatePresence mode="wait">
+        {step === 0 && (
+          <motion.div
+            key="step-0"
+            variants={fadeVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="text-center relative z-10 flex flex-col items-center"
+          >
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+              <Sparkles className="w-8 h-8" />
+            </div>
+            <Badge className="mb-4 bg-primary text-primary-foreground shadow-md px-3 py-1 text-xs uppercase tracking-widest">
+              Ferramenta Exclusiva
             </Badge>
-            <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">
-              Sua estratégia ideal
+            <h3 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-tight text-balance">
+              Pare de deixar dinheiro na mesa
             </h3>
-            <p className="text-muted-foreground text-sm">
-              Descubra a combinação mais barata para o seu volume de pacientes.
+            <p className="text-muted-foreground mb-8 text-base md:text-lg max-w-md mx-auto">
+              Nossa inteligência artificial analisa seu volume de pacientes e
+              cruza nossos planos para encontrar a{" "}
+              <strong>combinação exata mais lucrativa</strong> para você.
             </p>
-          </div>
-
-          <div className="space-y-3">
-            <label className="font-semibold text-sm text-foreground">
-              1. Qual o seu perfil de agenda?
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button
-                onClick={() => setAgendaType("flexible")}
-                className={`flex flex-col items-start p-3 rounded-xl border-2 transition-all text-left ${
-                  agendaType === "flexible"
-                    ? "border-primary bg-primary/10 ring-1 ring-primary/20"
-                    : "border-border bg-background hover:border-primary/40"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <Shuffle
-                    className={`w-4 h-4 ${agendaType === "flexible" ? "text-primary" : "text-muted-foreground"}`}
-                  />
-                  <span className="text-sm font-bold text-foreground">
-                    Dias Variados
-                  </span>
-                </div>
-                <span className="text-[11px] text-muted-foreground leading-tight">
-                  Atendo 1h hoje, 2h amanhã... Preciso de flexibilidade.
-                </span>
-              </button>
-
-              <button
-                onClick={() => setAgendaType("fixed")}
-                className={`flex flex-col items-start p-3 rounded-xl border-2 transition-all text-left ${
-                  agendaType === "fixed"
-                    ? "border-primary bg-primary/10 ring-1 ring-primary/20"
-                    : "border-border bg-background hover:border-primary/40"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <CalendarDays
-                    className={`w-4 h-4 ${agendaType === "fixed" ? "text-primary" : "text-muted-foreground"}`}
-                  />
-                  <span className="text-sm font-bold text-foreground">
-                    Concentrada
-                  </span>
-                </div>
-                <span className="text-[11px] text-muted-foreground leading-tight">
-                  Consigo juntar pacientes no mesmo dia ou turno.
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <label className="font-semibold text-sm text-foreground">
-              2. Quantas horas atende por mês?
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                min="1"
-                max="300"
-                value={hoursPerMonth}
-                onChange={(e) =>
-                  setHoursPerMonth(e.target.value ? Number(e.target.value) : "")
-                }
-                className="flex h-14 w-full rounded-xl border-2 border-primary/20 bg-background px-4 py-2 text-2xl font-bold text-primary ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10 transition-all"
-                placeholder="Ex: 20"
-              />
-              <span className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold">
-                horas / mês
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {[6, 10, 16, 20, 32].map((h) => (
-                <Button
-                  key={h}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setHoursPerMonth(h)}
-                  className="rounded-full h-7 text-xs border-primary/20 hover:bg-primary/10 hover:text-primary transition-colors"
-                >
-                  {h}h
-                </Button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-background rounded-2xl p-6 md:p-8 shadow-sm border border-border/50 h-full flex flex-col justify-center">
-          <div className="space-y-5">
-            {bestPlan.isUpsell && bestPlan.avulsoCost < bestPlan.cost ? (
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">
-                  Custo das {hoursPerMonth}h no avulso:
-                </span>
-                <span className="text-lg text-muted-foreground font-medium">
-                  R${" "}
-                  {bestPlan.avulsoCost.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-            ) : (
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-muted-foreground">
-                  Custo pagando Avulso:
-                </span>
-                <span className="text-lg line-through decoration-red-500 text-muted-foreground font-medium">
-                  R${" "}
-                  {bestPlan.avulsoCost.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-            )}
-
-            <div
-              className={`p-4 rounded-xl border ${bestPlan.isUpsell ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800" : "bg-primary/5 border-primary/10"}`}
+            <Button
+              size="lg"
+              onClick={handleStart}
+              className="rounded-full px-8 h-14 text-base font-bold shadow-lg shadow-primary/25 hover:scale-105 transition-transform"
             >
-              <div
-                className={`text-xs font-bold uppercase tracking-wider mb-1 ${bestPlan.isUpsell ? "text-blue-600 dark:text-blue-400" : "text-primary"}`}
-              >
-                Sua Melhor Opção
-              </div>
-              <div className="text-lg font-bold leading-tight mb-3">
-                {bestPlan.planName}
-              </div>
-              <div className="flex justify-between items-end">
-                <span className="text-sm font-medium text-muted-foreground">
-                  Valor otimizado:
-                </span>
-                <span
-                  className={`text-3xl font-extrabold ${bestPlan.isUpsell ? "text-blue-600 dark:text-blue-400" : "text-primary"}`}
-                >
-                  R${" "}
-                  {bestPlan.cost.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
+              Descobrir minha estratégia <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </motion.div>
+        )}
+
+        {step === 1 && (
+          <motion.div
+            key="step-1"
+            variants={fadeVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 w-full"
+          >
+            <div className="text-center mb-8">
+              <span className="text-sm font-bold text-primary uppercase tracking-wider mb-2 block">
+                Passo 1 de 2
+              </span>
+              <h3 className="text-2xl font-bold">
+                Como você organiza sua agenda?
+              </h3>
+              <p className="text-muted-foreground text-sm mt-2">
+                Isso define quais planos estarão disponíveis na análise.
+              </p>
             </div>
 
-            <div className="pt-2">
-              {bestPlan.isUpsell ? (
-                /* CARD DE UPSELL - EDUCATIVO */
-                <div className="bg-blue-100 dark:bg-blue-900/30 p-5 rounded-xl text-center space-y-2 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-blue-200/50 dark:bg-blue-800/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-center gap-1.5 text-sm font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wide mb-1">
-                      <Lightbulb className="w-4 h-4" />
-                      Visão de Negócio
-                    </div>
-                    <p className="text-lg font-bold text-blue-700 dark:text-blue-400 leading-tight">
-                      Ganhe {bestPlan.extraHours}{" "}
-                      {bestPlan.extraHours === 1
-                        ? "hora livre"
-                        : "horas livres"}{" "}
-                      para crescer!
-                    </p>
-                    <p className="text-xs font-medium text-blue-800/80 dark:text-blue-300 mt-2 leading-relaxed">
-                      Ao invés de pagar avulso, garanta o{" "}
-                      <strong>Pacote 10h</strong>. Use o tempo livre no seu
-                      consultório para gravar vídeos, conversar com nossos
-                      profissionais e captar novos pacientes.
-                    </p>
-                  </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                onClick={() => handleAgendaSelect("flexible")}
+                className="group flex flex-col items-center text-center p-6 rounded-2xl border-2 border-border bg-background hover:border-primary hover:bg-primary/5 transition-all shadow-sm hover:shadow-md"
+              >
+                <div className="w-12 h-12 rounded-full bg-muted group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors">
+                  <Shuffle className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
-              ) : (
-                /* CARD DE ECONOMIA PADRÃO */
-                <div className="bg-green-100 dark:bg-green-900/30 p-5 rounded-xl text-center space-y-1 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-green-200/50 dark:bg-green-800/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-center gap-1.5 text-sm font-bold text-green-800 dark:text-green-300 uppercase tracking-wide mb-1">
-                      <TrendingUp className="w-4 h-4" />
-                      Sua Economia Anual
-                    </div>
-                    <p className="text-4xl font-black text-green-600 dark:text-green-400 my-2">
+                <h4 className="font-bold text-lg mb-2">Dias Variados</h4>
+                <p className="text-sm text-muted-foreground leading-snug">
+                  Atendo 1h hoje, 2h amanhã... Preciso de total flexibilidade na
+                  semana.
+                </p>
+              </button>
+
+              <button
+                onClick={() => handleAgendaSelect("fixed")}
+                className="group flex flex-col items-center text-center p-6 rounded-2xl border-2 border-border bg-background hover:border-primary hover:bg-primary/5 transition-all shadow-sm hover:shadow-md"
+              >
+                <div className="w-12 h-12 rounded-full bg-muted group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors">
+                  <CalendarDays className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <h4 className="font-bold text-lg mb-2">Agenda Concentrada</h4>
+                <p className="text-sm text-muted-foreground leading-snug">
+                  Consigo juntar meus pacientes no mesmo dia ou turno garantido.
+                </p>
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 2 && (
+          <motion.div
+            key="step-2"
+            variants={fadeVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 w-full flex flex-col items-center text-center"
+          >
+            <span className="text-sm font-bold text-primary uppercase tracking-wider mb-2 block">
+              Passo 2 de 2
+            </span>
+            <h3 className="text-2xl font-bold mb-8">
+              Quantas horas você atende por mês?
+            </h3>
+
+            <div className="w-full max-w-sm space-y-6">
+              <div className="relative">
+                <input
+                  type="number"
+                  min="1"
+                  max="300"
+                  value={hoursPerMonth}
+                  onChange={(e) =>
+                    setHoursPerMonth(
+                      e.target.value ? Number(e.target.value) : "",
+                    )
+                  }
+                  autoFocus
+                  className="flex h-20 w-full text-center rounded-2xl border-2 border-primary/30 bg-background px-4 py-2 text-4xl font-black text-primary ring-offset-background placeholder:text-muted-foreground/30 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/20 transition-all shadow-inner"
+                  placeholder="0"
+                />
+                <span className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold">
+                  horas
+                </span>
+              </div>
+
+              <div className="flex flex-wrap justify-center gap-2">
+                {[6, 10, 16, 20, 32].map((h) => (
+                  <Button
+                    key={h}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setHoursPerMonth(h);
+                    }}
+                    className="rounded-full h-8 px-4 text-xs font-medium border-border hover:border-primary hover:bg-primary/10 hover:text-primary transition-colors"
+                  >
+                    {h}h
+                  </Button>
+                ))}
+              </div>
+
+              <Button
+                size="lg"
+                onClick={handleCalculate}
+                disabled={!hoursPerMonth}
+                className="w-full h-14 rounded-xl text-base font-bold shadow-lg mt-4"
+              >
+                Cruzar Dados e Ver Resultado{" "}
+                <TrendingUp className="ml-2 w-5 h-5" />
+              </Button>
+
+              <button
+                onClick={() => setStep(1)}
+                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                ← Voltar e mudar perfil da agenda
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 3 && (
+          <motion.div
+            key="step-3"
+            variants={fadeVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 w-full flex flex-col items-center justify-center text-center py-10"
+          >
+            <Loader2 className="w-12 h-12 text-primary animate-spin mb-6" />
+            <h3 className="text-2xl font-bold mb-2">
+              Analisando sua agenda...
+            </h3>
+            <p className="text-muted-foreground">
+              Cruzando seu perfil com nossas{" "}
+              {agendaType === "fixed"
+                ? "modalidades de turno"
+                : "modalidades flexíveis"}{" "}
+              para encontrar o menor custo.
+            </p>
+          </motion.div>
+        )}
+
+        {step === 4 && (
+          <motion.div
+            key="step-4"
+            variants={fadeVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="relative z-10 w-full"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <Badge className="bg-primary/20 text-primary hover:bg-primary/30 mb-2 border-0 shadow-none">
+                  Resultado Concluído
+                </Badge>
+                <h3 className="text-2xl font-bold">Sua Estratégia Vencedora</h3>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleReset}
+                title="Refazer simulação"
+                className="rounded-full hover:bg-primary/10 hover:text-primary"
+              >
+                <RefreshCcw className="w-5 h-5" />
+              </Button>
+            </div>
+
+            <div className="bg-background rounded-2xl p-6 shadow-sm border border-border/50">
+              <div className="space-y-5">
+                {bestPlan.isUpsell && bestPlan.avulsoCost < bestPlan.cost ? (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">
+                      Custo das {hoursPerMonth}h no avulso:
+                    </span>
+                    <span className="text-lg text-muted-foreground font-medium">
                       R${" "}
-                      {yearlySavings.toLocaleString("pt-BR", {
+                      {bestPlan.avulsoCost.toLocaleString("pt-BR", {
                         minimumFractionDigits: 2,
                       })}
-                    </p>
-                    <p className="text-xs font-medium text-green-700/80 dark:text-green-500">
-                      Lucro retido direto no seu bolso.
-                    </p>
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">
+                      Custo de {hoursPerMonth}h pagando Avulso:
+                    </span>
+                    <span className="text-lg line-through decoration-red-500 text-muted-foreground font-medium">
+                      R${" "}
+                      {bestPlan.avulsoCost.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                )}
+
+                <div
+                  className={`p-5 rounded-xl border-2 ${bestPlan.isUpsell ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800" : "bg-primary/5 border-primary/20"}`}
+                >
+                  <div
+                    className={`text-xs font-bold uppercase tracking-wider mb-2 ${bestPlan.isUpsell ? "text-blue-600 dark:text-blue-400" : "text-primary"}`}
+                  >
+                    Combinação Ideal
+                  </div>
+                  <div className="text-2xl font-bold leading-tight mb-4 text-foreground">
+                    {bestPlan.planName}
+                  </div>
+                  <div className="flex justify-between items-end pt-4 border-t border-border/50">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Valor mensal otimizado:
+                    </span>
+                    <span
+                      className={`text-4xl font-extrabold tracking-tight ${bestPlan.isUpsell ? "text-blue-600 dark:text-blue-400" : "text-primary"}`}
+                    >
+                      R${" "}
+                      {bestPlan.cost.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
                   </div>
                 </div>
-              )}
+
+                <div className="pt-2">
+                  {bestPlan.isUpsell ? (
+                    <div className="bg-blue-100 dark:bg-blue-900/30 p-5 rounded-xl text-center space-y-2">
+                      <div className="flex items-center justify-center gap-1.5 text-sm font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wide mb-1">
+                        <Lightbulb className="w-4 h-4" />
+                        Visão de Negócio
+                      </div>
+                      <p className="text-lg font-bold text-blue-700 dark:text-blue-400 leading-tight">
+                        Ganhe {bestPlan.extraHours}{" "}
+                        {bestPlan.extraHours === 1
+                          ? "hora livre"
+                          : "horas livres"}{" "}
+                        para crescer!
+                      </p>
+                      <p className="text-sm font-medium text-blue-800/80 dark:text-blue-300 mt-2 leading-relaxed">
+                        Ao invés de pagar avulso, garanta o{" "}
+                        <strong>Pacote 10h</strong>. Use o tempo excedente para
+                        gravar vídeos, parcerias e captar mais pacientes.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-green-100 dark:bg-green-900/30 p-5 rounded-xl text-center space-y-1">
+                      <div className="flex items-center justify-center gap-1.5 text-sm font-bold text-green-800 dark:text-green-300 uppercase tracking-wide mb-1">
+                        <TrendingUp className="w-4 h-4" />
+                        Sua Economia Anual
+                      </div>
+                      <p className="text-4xl font-black text-green-600 dark:text-green-400 my-2">
+                        R${" "}
+                        {yearlySavings.toLocaleString("pt-BR", {
+                          minimumFractionDigits: 2,
+                        })}
+                      </p>
+                      <p className="text-sm font-medium text-green-700/80 dark:text-green-500">
+                        Isso é lucro retido direto no seu bolso, sem mágica.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <p className="text-[10px] text-muted-foreground/70 flex items-start gap-1.5 leading-tight mt-4">
-              <Info className="w-3.5 h-3.5 shrink-0" />
-              {agendaType === "flexible"
-                ? "Como você selecionou 'Dias Variados', nossa IA otimizou o valor focando exclusivamente nos nossos Bancos de Horas (Pacotes)."
-                : "Como você pode concentrar a agenda, nossa IA buscou o menor custo absoluto incluindo opções de Turno Fixo e Diárias."}
-            </p>
-          </div>
-        </div>
-      </div>
+            <div className="mt-6 flex justify-center">
+              <Button
+                asChild
+                className="rounded-full h-12 px-8 font-bold text-base shadow-lg hover:scale-105 transition-transform w-full sm:w-auto"
+              >
+                <a href="https://wa.me/5511919119054" target="_blank">
+                  Garantir esse valor agora{" "}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -490,7 +639,6 @@ export default function PricingPage() {
     <main className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
       <section className="relative py-20 lg:py-24 overflow-hidden bg-muted/30">
         <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
         <div className="mx-auto max-w-7xl px-4 lg:px-8 text-center">
@@ -519,12 +667,10 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Simulador */}
       <section className="py-10 px-4">
         <SavingsSimulator />
       </section>
 
-      {/* Cards de Preço */}
       <section className="py-16 relative z-10">
         <div className="mx-auto max-w-[1400px] px-4 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-start">
@@ -656,7 +802,6 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="py-20 bg-background border-t border-border/40">
         <div className="mx-auto max-w-3xl px-4 lg:px-8">
           <div className="text-center mb-10">
@@ -685,7 +830,6 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* CTA Final */}
       <section className="py-16 border-t border-border/50 bg-muted/10">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">
