@@ -20,17 +20,17 @@ const features = [
   {
     icon: Wifi,
     title: "Internet Dedicada",
-    description: "Link redundante de alta velocidade para telemedicina.",
+    description: "Internet alta velocidade para atendimentos.",
   },
   {
     icon: Coffee,
-    title: "Copa & Amenities",
-    description: "Café e água em ambiente de descompressão.",
+    title: "Copa",
+    description: "Copa com cafézinho quentinho para você e seus pacientes.",
   },
   {
     icon: Armchair,
     title: "Mobiliário Premium",
-    description: "Poltronas ergonômicas e decoração de alto padrão.",
+    description: "Salas com decoração de alto padrão.",
   },
   {
     icon: CalendarCheck,
@@ -40,7 +40,7 @@ const features = [
   {
     icon: Key,
     title: "Acesso Inteligente",
-    description: "Entrada via QR Code ou Biometria 24h.",
+    description: "Entrada via celular ou Qr code",
   },
 ];
 

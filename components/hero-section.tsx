@@ -65,7 +65,7 @@ export function HeroSection() {
 
             <FadeInUp delay={0.1}>
               <p className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                A estrutura completa para nutricionistas, psicólogos,
+                A estrutura completa para médicos, nutricionistas, psicólogos,
                 esteticista e profissionais de saúde em geral que querem
                 <strong className="text-foreground font-semibold">
                   {" "}
